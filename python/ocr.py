@@ -27,7 +27,7 @@ def extractText(image_location: str, preprocess: str = "none") -> str:
 
 
 class OCR(pipeline.ProcessingOperation):
-    def process(self, video: VideoCapture, file_locator: FileLocator) -> VideoCapture:
+    def process(self, file_locator: FileLocator) -> VideoCapture:
         # Don't do anything to the video. Instead read the screenshots and
         filenames = glob.glob(file_locator.getScreenshotDirectory() + "/" + file_locator.getFilePrefix() + "*")
         output_json_name = file_locator.getOCRJsonName()
@@ -42,7 +42,7 @@ class OCR(pipeline.ProcessingOperation):
         with open(output_json_name, "w") as write_file:
             json.dump(output, write_file)
 
-        return video
+        return
 
 # filename = "/video_mp4_1003.png"
 # print(int((filename.split("_")[-1]).split(".")[0]))

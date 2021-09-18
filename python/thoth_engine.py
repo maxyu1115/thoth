@@ -31,14 +31,9 @@ def main():
     # setup pipeline
     processor = setupPipeline()
 
-    locator = util.FileLocator(os.path.basename(args.vid), args.target)
+    locator = util.FileLocator(args.vid, args.target)
 
-    video = cv2.VideoCapture(args.vid)
-    processor.processVideo(video, locator)
-
-    # clean up
-    video.release()
-    cv2.destroyAllWindows()
+    processor.processVideo(locator)
     return
 
 

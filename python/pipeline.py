@@ -2,15 +2,15 @@ import cv2
 from cv2 import VideoCapture
 import util
 
+
 class ProcessingOperation:
     """
     Interface for all video processing algorithms we add to our pipeline
     """
-    def process(self, video: VideoCapture, file_locator: util.FileLocator) -> VideoCapture:
+    def process(self, file_locator: util.FileLocator) -> None:
         """
-        :param video: video that we want to process
         :param file_locator: file locator to locate files and directories
-        :return: video after processing
+        :return: void return
         """
         raise NotImplementedError()
 
@@ -19,7 +19,7 @@ class ProcessingOperation:
         Post processing hook for algorithms that want to do things after the pipeline finishes
         :return: void return
         """
-        pass
+        return
 
 
 class Pipeline:
@@ -32,13 +32,13 @@ class Pipeline:
     def addOperation(self, op: ProcessingOperation):
         self.operations.append(op)
 
-    def processVideo(self, video: VideoCapture, file_locator: util.FileLocator) -> VideoCapture:
+    def processVideo(self, file_locator: util.FileLocator) -> None:
         for op in self.operations:
-            video = op.process(video, file_locator)
+            op.process(file_locator)
 
         for op in self.operations:
             op.postProcess()
 
-        return video
+        return
 
 

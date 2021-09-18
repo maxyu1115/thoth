@@ -14,9 +14,10 @@ class FileLocator:
     """
     File locator utility class
     """
-    def __init__(self, file_name: str, output_path: str):
-        self.file_name = file_name
-        filename_list = file_name.split(".")
+    def __init__(self, file_pathname: str, output_path: str):
+        self.file_pathname = file_pathname
+        self.file_name = os.path.basename(file_pathname)
+        filename_list = self.file_name.split(".")
         if len(filename_list) != 2:
             raise Exception("Bad file name format! ")
         self.file_prefix = str.format("{}_{}_", filename_list[0], filename_list[1])
@@ -29,6 +30,12 @@ class FileLocator:
         self.ocr_json_name = os.path.join(self.json_directory, self.file_prefix + "ocr.json")
 
         self.index_directory = os.path.join(self.output_path, "idx")
+
+    def getFilePathName(self) -> str:
+        return self.file_pathname
+
+    def getFileName(self) -> str:
+        return self.file_name
 
     def getOutputRoot(self) -> str:
         return self.output_path
