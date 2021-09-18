@@ -1,3 +1,4 @@
+import glob
 import os
 
 TEXT = "text"
@@ -32,6 +33,11 @@ def _make_path_dir(path_name: str):
     if not os.path.exists(path_name):
         os.makedirs(path_name)
 
+def cleanDir(path):
+        files = glob.glob(path + "/*")
+        for f in files: 
+            print(f"{bcolors.OKCYAN}removing files{bcolors.ENDC}", f)
+            os.remove(f)
 
 class DirectoryLocator:
     """

@@ -1,4 +1,4 @@
-import util
+from util import cleanDir, FileLocator
 from multiprocessing import Pool
 
 
@@ -6,7 +6,7 @@ class ProcessingOperation:
     """
     Interface for all video processing algorithms we add to our pipeline
     """
-    def process(self, file_locator: util.FileLocator) -> None:
+    def process(self, file_locator: FileLocator) -> None:
         """
         :param file_locator: file locator to locate files and directories
         :return: void return
@@ -31,7 +31,7 @@ class Pipeline:
     def addOperation(self, op: ProcessingOperation):
         self.operations.append(op)
 
-    def processVideo(self, file_locator: util.FileLocator) -> None:
+    def processVideo(self, file_locator: FileLocator) -> None:
         pool = Pool()
 
         # Bad coding style !!!
@@ -40,12 +40,12 @@ class Pipeline:
         ocr_helper = self.operations[2]
         woosh_wraper = self.operations[3]
         # Action block 1: run video slide detect and transcribe in parallel
+        # OCR starts after detect
         result = pool.apply_async(transcriber.process, args=(file_locator,))
         detector.process(file_locator)
-        
-        # Action block 2: group words by video slide detection result & OCR
         ocr_helper.process(file_locator)
-        # print("async result", result.get(timeout = 3000))
+
+        # Action block 2: group words by video slide detection result & OCR
         transcriber.setLocator(file_locator)
         transcriber.assemble_words_by_slides(result.get())
 
@@ -54,9 +54,17 @@ class Pipeline:
         # for op in self.operations:
         #     op.process(file_locator)
 
-        for op in self.operations:
-            op.postProcess()
+        self.clean_up(file_locator)
 
         return
+
+    def clean_up(self, file_locator: FileLocator) -> None:
+        ###
+        # Cleans up all temporary directoraries.
+        ###
+        dirs = [file_locator.getAudioDirectory(), file_locator.getJsonDirectory(),
+        file_locator.getIndexDirectory(), file_locator.getScreenshotDirectory()]
+
+        [cleanDir(d) for d in dirs]        
 
 
