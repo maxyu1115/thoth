@@ -1,8 +1,5 @@
-# Standard PySceneDetect imports:
-from scenedetect import VideoManager
-from scenedetect import SceneManager
-
 from scenedetect.scene_detector import SceneDetector
+
 import numpy as np
 
 
@@ -13,7 +10,7 @@ class StdDetector(SceneDetector):
     STD_RED, STD_GREEN, STD_BLUE = ('std_r', 'std_g', 'std_b')
     METRIC_KEYS = [FRAME_SCORE_KEY, STD_RED, STD_GREEN, STD_BLUE]
 
-    def __init__(self, skip=10, window=10, threshold=10, average=1):
+    def __init__(self, skip: int = 10, window: int = 10, threshold: int = 10, average: int = 1):
         super(StdDetector, self).__init__()
         self.skip = skip
         self.window = window
@@ -27,12 +24,12 @@ class StdDetector(SceneDetector):
     def get_metrics(self):
         return StdDetector.METRIC_KEYS
 
-    def is_processing_required(self, frame_num):
+    def is_processing_required(self, frame_num : int):
         return self.stats_manager is None or (
             not self.stats_manager.metrics_exist(frame_num, StdDetector.METRIC_KEYS))
 
     # Calculate std from a list of frames or averaged frames
-    def calculate_std(self, frame_num):
+    def calculate_std(self, frame_num : int):
         std_mat = np.std(np.stack(self.averaged_frames, axis=-1), axis=-1)
         std_val = np.mean(np.sum((std_mat * std_mat), axis=-1) ** 0.5)
         std_r, std_g, std_b = np.mean(np.mean(std_mat, axis=0), axis=0)
@@ -41,10 +38,10 @@ class StdDetector(SceneDetector):
             self.stats_manager.set_metrics(frame_num, {
                 self.FRAME_SCORE_KEY: std_val, self.STD_RED: std_r,
                 self.STD_GREEN: std_g, self.STD_BLUE: std_b})
+        # print(type(std_val))
         return std_val
 
-    def process_frame(self, frame_num, frame_img):
-
+    def process_frame(self, frame_num : int, frame_img : np.ndarray):
         cut_list = []
 
         # Check whether has been initialized
@@ -80,21 +77,3 @@ class StdDetector(SceneDetector):
 
     def post_process(self, scene_list):
         return []
-
-
-def find_scenes(video_path, threshold=30.0):
-    # Create our video & scene managers, then add the detector.
-    video_manager = VideoManager([video_path])
-    scene_manager = SceneManager()
-    scene_manager.add_detector(
-        StdDetector())
-
-    # Improve processing speed by downscaling before processing.
-    video_manager.set_downscale_factor()
-
-    # Start the video manager and perform the scene detection.
-    video_manager.start()
-    scene_manager.detect_scenes(frame_source=video_manager)
-
-    # Each returned scene is a tuple of the (start, end) timecode.
-    return scene_manager.get_scene_list()
