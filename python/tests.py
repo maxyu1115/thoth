@@ -14,7 +14,7 @@ def test_postprocess_transcribe(locator):
     process.postProcess()
 
 def test_integrate_with_slide_detect_process(locator):
-    detect = SlideDetect("unanimated_slides")
+    detect = SlideDetect("animated_slides")
     detect.process(locator)
     process = video_to_text.VideoToTextProcessOperation()
     process.process(locator)

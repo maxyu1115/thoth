@@ -1,5 +1,6 @@
 import subprocess
 import util
+from util import bcolors
 import json
 from pipeline import ProcessingOperation
 from tinytag import TinyTag
@@ -18,19 +19,24 @@ bucket_name = "hackrice-11"
 # from .mp4 to .flac with single channel
 class VideoToTextProcessOperation(ProcessingOperation):
 
+    def __init__(self) -> None:
+        super().__init__()
+        self.file_locator = None
+        self.word_list = []
+
     def setLocator(self, locator):
         self.file_locator = locator
 
     def process(self, file_locator: util.FileLocator) -> None:
         self.file_locator = file_locator
-        word_list = self.get_speech_from_video(file_locator.getFilePathName())
-        self.assemble_words_by_slides(word_list)
+        return self.get_speech_from_video()
+        # self.assemble_words_by_slides(word_list)
 
     def postProcess(self) -> None:
         audio_dir = self.file_locator.getAudioDirectory()
         files = glob.glob(audio_dir + "/*")
         for f in files: 
-            print("removing files", f)
+            print(f"{bcolors.OKBLUE}removing files{bcolors.ENDC}", f)
             os.remove(f)
 
     def extract_audio_file(self, filename):
@@ -51,7 +57,7 @@ class VideoToTextProcessOperation(ProcessingOperation):
         blob.upload_from_filename(filename)
 
         print(
-            "File {} uploaded to {}.".format(
+            (bcolors.OKBLUE + "File {} uploaded to {}." + bcolors.ENDC).format(
                 filename, blob_name
             )
         )
@@ -64,7 +70,7 @@ class VideoToTextProcessOperation(ProcessingOperation):
         client = speech.SpeechClient()
 
         tag = TinyTag.get(filename)
-        print("the sample rate is", tag.samplerate)
+        # print("the sample rate is", tag.samplerate)
 
         audio = speech.RecognitionAudio(uri=gcs_uri)
         config = speech.RecognitionConfig(
@@ -77,8 +83,8 @@ class VideoToTextProcessOperation(ProcessingOperation):
 
         operation = client.long_running_recognize(config=config, audio=audio)
 
-        print("Waiting for operation to complete...")
-        response = operation.result(timeout=200)
+        print(f"{bcolors.OKBLUE}Waiting for operation to complete...{bcolors.ENDC}")
+        response = operation.result(timeout=3000)
         rtn = []
 
         # Each result is for a consecutive portion of the audio. Iterate through
@@ -95,12 +101,12 @@ class VideoToTextProcessOperation(ProcessingOperation):
                 end_time = word_info.end_time
                 rtn.append((word, start_time.total_seconds() * 1000, end_time.total_seconds() * 1000))
         # print(rtn[20:])
+        self.word_list = rtn
         return rtn
 
     # the entry point for this file.
     # should be mp4 or mov file
-    def get_speech_from_video(self, video_name):
-        print("file path name", self.file_locator.getFilePathName())
+    def get_speech_from_video(self):
         audio_name = self.extract_audio_file(self.file_locator.getFilePathName())
         blob_name = self.upload_to_cloud(audio_name)
         return self.transcribe_file(gcp_link.format(blob_name), audio_name)
@@ -118,8 +124,8 @@ class VideoToTextProcessOperation(ProcessingOperation):
         output = [self.file_locator.getFilePathName()]
         output_json_name = self.file_locator.getSpeechJsonName()
 
-        print("word list", word_list[:20])
-        print("json time", output)
+        # print("word list", word_list[:20])
+        # print("json time", output)
 
         for i in range(1, len(slides)):
             slide = slides[i]
@@ -128,10 +134,10 @@ class VideoToTextProcessOperation(ProcessingOperation):
             file_name = slide["image"]
             str = ""
             while idx < len(word_list):
-                print("start time", start_time)
-                print("end time", end_time)
-                print("word start time ", word_list[idx][1])
-                print("word end time ", word_list[idx][2])
+                # print("start time", start_time)
+                # print("end time", end_time)
+                # print("word start time ", word_list[idx][1])
+                # print("word end time ", word_list[idx][2])
                 if word_list[idx][2] <= end_time:
                     str += " " + word_list[idx][0]
                     idx += 1
