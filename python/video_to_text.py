@@ -78,7 +78,7 @@ class VideoToTextProcessOperation(ProcessingOperation):
         operation = client.long_running_recognize(config=config, audio=audio)
 
         print("Waiting for operation to complete...")
-        response = operation.result(timeout=200)
+        response = operation.result(timeout=3000)
         rtn = []
 
         # Each result is for a consecutive portion of the audio. Iterate through
@@ -118,8 +118,8 @@ class VideoToTextProcessOperation(ProcessingOperation):
         output = [self.file_locator.getFilePathName()]
         output_json_name = self.file_locator.getSpeechJsonName()
 
-        print("word list", word_list[:20])
-        print("json time", output)
+        # print("word list", word_list[:20])
+        # print("json time", output)
 
         for i in range(1, len(slides)):
             slide = slides[i]
@@ -128,10 +128,10 @@ class VideoToTextProcessOperation(ProcessingOperation):
             file_name = slide["image"]
             str = ""
             while idx < len(word_list):
-                print("start time", start_time)
-                print("end time", end_time)
-                print("word start time ", word_list[idx][1])
-                print("word end time ", word_list[idx][2])
+                # print("start time", start_time)
+                # print("end time", end_time)
+                # print("word start time ", word_list[idx][1])
+                # print("word end time ", word_list[idx][2])
                 if word_list[idx][2] <= end_time:
                     str += " " + word_list[idx][0]
                     idx += 1
