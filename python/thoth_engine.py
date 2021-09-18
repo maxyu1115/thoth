@@ -4,6 +4,7 @@ import cv2
 import pipeline
 import util
 import ocr
+import video_to_text
 
 parser = argparse.ArgumentParser(description='Run the thoth pipeline. ')
 parser.add_argument('--vid', type=str, help='location of the video')
@@ -17,6 +18,7 @@ def setupPipeline():
     # TODO: add std detect here
 
     processor.addOperation(ocr.OCR())
+    processor.addOperation(video_to_text.VideoToTextProcessOperation())
 
     # TODO: add speech2text here
     # TODO: add whoosh indexing here

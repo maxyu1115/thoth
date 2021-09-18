@@ -93,7 +93,7 @@ class VideoToTextProcessOperation(ProcessingOperation):
                 word = word_info.word
                 start_time = word_info.start_time
                 end_time = word_info.end_time
-                rtn.append((word, start_time.total_seconds() * 1000))
+                rtn.append((word, start_time.total_seconds() * 1000, end_time.total_seconds() * 1000))
         # print(rtn[20:])
         return rtn
 
@@ -106,7 +106,7 @@ class VideoToTextProcessOperation(ProcessingOperation):
         return self.transcribe_file(gcp_link.format(blob_name), audio_name)
 
     def assemble_words_by_slides(self, word_list):
-        detect_json_path = self.file_locator.getJsonDirectory() + '/' + self.file_locator.getDetectJsonName()
+        detect_json_path = self.file_locator.getDetectJsonName()
         # Opening JSON file
         jfile = open(detect_json_path,)
         
@@ -115,20 +115,33 @@ class VideoToTextProcessOperation(ProcessingOperation):
         slides = json.load(jfile)
         str = ""
         idx = 0
-        output = []
+        output = [self.file_locator.getFilePathName()]
         output_json_name = self.file_locator.getSpeechJsonName()
 
-        for slide in slides:
-            start_time = slide.start_time
-            end_time = slide.end_time
-            file_name = slide.image
-            if word_list[idx][1] <= end_time and word_list[idx][1] <= start_time:
-                str += " " + word_list[idx][0]
-                idx += 1
-            else: 
+        print("word list", word_list[:20])
+        print("json time", output)
+
+        for i in range(1, len(slides)):
+            slide = slides[i]
+            start_time = slide["start_time"]
+            end_time = slide["end_time"]
+            file_name = slide["image"]
+            str = ""
+            while idx < len(word_list):
+                print("start time", start_time)
+                print("end time", end_time)
+                print("word start time ", word_list[idx][1])
+                print("word end time ", word_list[idx][2])
+                if word_list[idx][2] <= end_time:
+                    str += " " + word_list[idx][0]
+                    idx += 1
+                else: 
+                    output.append(util.make_transcribe_dict(start_time, str, file_name, end_time))
+                    print(json_convert_progress.format(file_name, str, start_time, end_time))
+                    break
+            if len(output) == 1 or output[-1]["end_time"] != end_time:
                 output.append(util.make_transcribe_dict(start_time, str, file_name, end_time))
-                print(json_convert_progress.format(file_name, str, start_time, end_time))
-                str = ""
+
         
         # write data to json file
         with open(output_json_name, "w") as write_file:
