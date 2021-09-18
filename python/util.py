@@ -111,7 +111,7 @@ class FileLocator(DirectoryLocator):
         :param time_in_milliseconds: time of screenshot in milliseconds
         :return: name of screenshot at time t
         """
-        return os.path.join(self.screenshot_directory, self.file_prefix + str(time_in_milliseconds) + ".png")
+        return os.path.join(self.screenshot_directory, self.file_prefix + str(int(time_in_milliseconds)) + ".png")
 
     def getDetectJsonName(self) -> str:
         return self.detect_json_name
