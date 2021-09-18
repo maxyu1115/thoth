@@ -17,8 +17,8 @@ args = parser.parse_args()
 def setupPipeline():
     processor = pipeline.Pipeline()
     processor.addOperation(slideDetect.SlideDetect("animated_slides" if args.animated else "unanimated_slides"))
-    processor.addOperation(ocr.OCR())
     processor.addOperation(video_to_text.VideoToTextProcessOperation())
+    processor.addOperation(ocr.OCR())
     processor.addOperation(whooshWrapper.Indexer())
     return processor
 
