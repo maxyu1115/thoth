@@ -444,6 +444,11 @@
   "resolved" "https://registry.npmjs.org/@tootallnate/once/-/once-1.1.2.tgz"
   "version" "1.1.2"
 
+"@types/app-root-dir@^0.1.0":
+  "integrity" "sha512-hL5zdUZ6OZE2DQ38CTxvcTIPYT8YXQE5wq3cs4EWf6NTL+HbyD+9yKeta6qNTuYS68JfqSVgTpwPwoBEhNZLIA=="
+  "resolved" "https://registry.npmjs.org/@types/app-root-dir/-/app-root-dir-0.1.0.tgz"
+  "version" "0.1.0"
+
 "@types/cacheable-request@^6.0.1":
   "integrity" "sha512-B3xVo+dlKM6nnKTcmm5ZtY/OL8bOAOd2Olee9M1zft65ox50OzjEHW91sDiU9j6cvW8Ejg1/Qkf4xd2kugApUA=="
   "resolved" "https://registry.npmjs.org/@types/cacheable-request/-/cacheable-request-6.0.2.tgz"
@@ -934,6 +939,11 @@
   dependencies:
     "normalize-path" "^3.0.0"
     "picomatch" "^2.0.4"
+
+"app-root-dir@^1.0.2":
+  "integrity" "sha1-OBh+wt6nV3//Az/8sSFyaS/24Rg="
+  "resolved" "https://registry.npmjs.org/app-root-dir/-/app-root-dir-1.0.2.tgz"
+  "version" "1.0.2"
 
 "aproba@^1.0.3":
   "integrity" "sha512-Y9J6ZjXtoYh8RnXVCMOU/ttDmk1aBjunq9vO0ta5x85WDQiQfUF9sIPBITdbiiIVcBo03Hi3jMxigBtsddlXRw=="
