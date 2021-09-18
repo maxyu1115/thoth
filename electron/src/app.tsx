@@ -3,15 +3,6 @@ import { render } from 'react-dom';
 import { getDirname, runThoth } from './preload';
 import { CustomDropzone } from './components';
 
-declare global {
-  interface Window {
-    thoth: {
-      runThoth: typeof runThoth;
-      getDirname: typeof getDirname;
-    };
-  }
-}
-
 const App = (): JSX.Element => {
   const [fileName, setFileName] = useState('');
   const [output, setOutput] = useState('');
