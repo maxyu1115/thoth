@@ -93,7 +93,7 @@ class VideoToTextProcessOperation(ProcessingOperation):
                 word = word_info.word
                 start_time = word_info.start_time
                 end_time = word_info.end_time
-                rtn.append((word, start_time.total_seconds()))
+                rtn.append((word, start_time.total_seconds() * 1000))
         # print(rtn[20:])
         return rtn
 
@@ -106,19 +106,27 @@ class VideoToTextProcessOperation(ProcessingOperation):
         return self.transcribe_file(gcp_link.format(blob_name), audio_name)
 
     def assemble_words_by_slides(self, word_list):
-        # suppose we have a list of time: format : (start time, end time, image path)
-        slides_time = []
+        detect_json_path = self.file_locator.getJsonDirectory() + '/' + self.file_locator.getDetectJsonName()
+        # Opening JSON file
+        jfile = open(detect_json_path,)
+        
+        # returns JSON object as
+        # a dictionary
+        slides = json.load(jfile)
         str = ""
         idx = 0
         output = []
         output_json_name = self.file_locator.getSpeechJsonName()
 
-        for start_time, end_time, file_name in slides_time:
+        for slide in slides:
+            start_time = slide.start_time
+            end_time = slide.end_time
+            file_name = slide.image
             if word_list[idx][1] <= end_time and word_list[idx][1] <= start_time:
                 str += " " + word_list[idx][0]
                 idx += 1
             else: 
-                output.append(util.make_ocr_dict(start_time, str, file_name, end_time))
+                output.append(util.make_transcribe_dict(start_time, str, file_name, end_time))
                 print(json_convert_progress.format(file_name, str, start_time, end_time))
                 str = ""
         
