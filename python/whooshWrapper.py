@@ -55,6 +55,8 @@ class Indexer(pipeline.ProcessingOperation):
         for filename in filenames:
             with open(filename, "r") as read_file:
                 slice_data = json.load(read_file)
+            assert(slice_data[0] == file_locator.file_pathname)
+            slice_data = slice_data[1:]
             for slice in slice_data:
                 self.whoosh.createIndex(file_locator.file_name, file_locator.file_pathname, slice[util.START_TIME], slice[util.TEXT])
 
