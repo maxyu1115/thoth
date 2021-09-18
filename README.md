@@ -5,3 +5,5 @@ The following libraries are required:
 `pip install opencv-python`
 
 `pip install SpeechRecognition`
+
+` pip install pyinstaller`
