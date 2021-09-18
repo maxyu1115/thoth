@@ -71,17 +71,26 @@ class SlideDetect(pipeline.ProcessingOperation):
         else:
             fps = cap.get(cv2.CAP_PROP_FPS)
 
+        print("fps: ", fps)
         output = []
         frame_num = 0
         slice_num = 0
-        top_frame_count = 0
-        curr_frame_count = 0
-        top_frame = None
-        top_frame_idx = -1
-        curr_frame = None
+        is_first = True
         while cap.isOpened() and slice_num < len(frames):
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            if is_first:
+                top_frame = frame
+                top_frame_idx = frame_num
+                top_frame_count = 1
+                curr_frame = frame
+                curr_frame_count = 1
+                is_first = False
 
             if frame_num == frames[slice_num]:
+                # print(frame_num, top_frame_count)
                 # End of a video slice
                 start_time = int(frames[slice_num - 1] * 1000 / fps) if slice_num > 0 else 0
                 end_time = int(frame_num * 1000 / fps)
@@ -91,29 +100,31 @@ class SlideDetect(pipeline.ProcessingOperation):
                 cv2.imwrite(image_path, top_frame)
                 output.append(util.make_detect_dict(start_time, end_time, image_time, image_path))
                 slice_num += 1
-                top_frame_count = 0
-                curr_frame_count = 0
-                top_frame = None
-                top_frame_idx = -1
-
-            ret, frame = cap.read()
-            if not ret:
-                break
-            frame_num += 1
-
-            if top_frame is None:
+                top_frame_count = 1
                 top_frame = frame
                 top_frame_idx = frame_num
+                curr_frame_count = 1
+                curr_frame = frame
 
-            if np.sum(1 - np.equal(frame, curr_frame)) < (frame.size * 0.25):
+            if np.sum(1 - np.equal(frame, curr_frame)) < (frame.size * 0.15):
                 curr_frame_count += 1
             else:
                 if curr_frame_count >= top_frame_count:
                     top_frame = curr_frame
                     top_frame_count = curr_frame_count
-                    top_frame_idx = frame_num - curr_frame_count
+                    top_frame_idx = frame_num - curr_frame_count + 1
                 curr_frame = frame
                 curr_frame_count = 1
+
+            frame_num += 1
+
+        start_time = int(frames[slice_num - 1] * 1000 / fps) if slice_num > 0 else 0
+        end_time = int(frame_num * 1000 / fps)
+        image_time = int(top_frame_idx * 1000 / fps)
+        image_path = file_locator.getScreenshotName(image_time)
+        # print(image_path, top_frame)
+        cv2.imwrite(image_path, top_frame)
+        output.append(util.make_detect_dict(start_time, end_time, image_time, image_path))
 
         cap.release()
         cv2.destroyAllWindows()
@@ -125,7 +136,7 @@ class SlideDetect(pipeline.ProcessingOperation):
 import os
 
 if __name__ == "__main__":
-    filename = "test/SlideChangeTest1.mov"
-    locator = FileLocator(filename, os.getcwd() + "/output66/temp")
+    filename = "test/SlideChangeTest4.mp4"
+    locator = FileLocator(filename, os.getcwd() + "/output4s/temp")
     detect = SlideDetect("unanimated_slides")
     detect.process(locator)
