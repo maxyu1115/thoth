@@ -5,7 +5,7 @@ class ProcessingOperation:
     """
     Interface for all video processing algorithms we add to our pipeline
     """
-    def process(self, video) -> VideoCapture:
+    def process(self, video: VideoCapture) -> VideoCapture:
         """
         :param video: video that we want to process
         :return: video after processing
