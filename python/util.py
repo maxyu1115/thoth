@@ -21,6 +21,14 @@ class FileLocator:
         """
         return self.output_path + "image"
 
+    def getScreenshotName(self, time_in_seconds: int) -> str:
+        """
+        Sample output: "xxx/image/test_mp4_1034.png"
+        :param time_in_seconds: time of screenshot in seconds
+        :return: name of screenshot at time t
+        """
+        return str.format("{}/{}_{}_{}.png", self.getScreenshotDirectory(), self.name, self.extension, time_in_seconds)
+
     def getJsonDirectory(self) -> str:
         """
         Sample output: "xxx/json"
