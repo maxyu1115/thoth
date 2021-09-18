@@ -17,7 +17,7 @@ def make_detect_dict(start_time: int, end_time: int, image_time: int, image_loca
     return {START_TIME: start_time, END_TIME: end_time, IMAGE_TIME: image_time, IMAGE_LOC: image_location}
 
 
-def __make_path_dir__(path_name: str):
+def _make_path_dir(path_name: str):
     if not os.path.exists(path_name):
         os.makedirs(path_name)
 
@@ -29,19 +29,19 @@ class DirectoryLocator:
 
     def __init__(self, output_path: str):
         self.output_path = output_path
-        __make_path_dir__(self.output_path)
+        _make_path_dir(self.output_path)
 
         self.screenshot_directory = os.path.join(self.output_path, "image")
-        __make_path_dir__(self.screenshot_directory)
+        _make_path_dir(self.screenshot_directory)
 
         self.json_directory = os.path.join(self.output_path, "json")
-        __make_path_dir__(self.json_directory)
+        _make_path_dir(self.json_directory)
 
         self.index_directory = os.path.join(self.output_path, "idx")
-        __make_path_dir__(self.index_directory)
+        _make_path_dir(self.index_directory)
 
         self.audio_directory = os.path.join(self.output_path, "audio")
-        __make_path_dir__(self.audio_directory)
+        _make_path_dir(self.audio_directory)
 
     def makeJsonPathname(self, filename: str) -> str:
         return os.path.join(self.json_directory, filename)
