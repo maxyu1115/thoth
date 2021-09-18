@@ -1,3 +1,5 @@
+import os
+
 TEXT = "text"
 IMAGE_LOC = "image"
 START_TIME = "start_time"
@@ -18,15 +20,15 @@ class FileLocator:
         if len(filename_list) != 2:
             raise Exception("Bad file name format! ")
         self.file_prefix = str.format("{}_{}_", filename_list[0], filename_list[1])
-        self.output_path = output_path if output_path[-1] == '/' else output_path + "/"
+        self.output_path = output_path
 
-        self.screenshot_directory = self.output_path + "image"
+        self.screenshot_directory = os.path.join(self.output_path, "image")
 
-        self.json_directory = self.output_path + "json"
-        self.speech_json_name = str.format("{}/{}speech.json", self.getJsonDirectory(), self.file_prefix)
-        self.ocr_json_name = str.format("{}/{}ocr.json", self.getJsonDirectory(), self.file_prefix)
+        self.json_directory = os.path.join(self.output_path, "json")
+        self.speech_json_name = os.path.join(self.json_directory, self.file_prefix + "speech.json")
+        self.ocr_json_name = os.path.join(self.json_directory, self.file_prefix + "ocr.json")
 
-        self.index_directory = self.output_path + "idx"
+        self.index_directory = os.path.join(self.output_path, "idx")
 
     def getOutputRoot(self) -> str:
         return self.output_path
@@ -47,7 +49,7 @@ class FileLocator:
         :param time_in_seconds: time of screenshot in seconds
         :return: name of screenshot at time t
         """
-        return str.format("{}/{}{}.png", self.screenshot_directory, self.file_prefix, time_in_seconds)
+        return os.path.join(self.screenshot_directory, self.file_prefix + str(time_in_seconds) + ".png")
 
     def getJsonDirectory(self) -> str:
         """
