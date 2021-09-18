@@ -1,4 +1,6 @@
 import os
+import glob
+
 
 TEXT = "text"
 IMAGE_LOC = "image"
@@ -9,6 +11,15 @@ END_TIME = "end_time"
 def make_ocr_dict(start_time: int, text: str, image_location: str):
     return {START_TIME: start_time, TEXT: text, IMAGE_LOC: image_location}
 
+def make_transcribe_dict(start_time: int, text: str, image_location: str, end_time):
+    return {START_TIME: start_time, TEXT: text, IMAGE_LOC: image_location, END_TIME: end_time}
+
+# Returns a list of image name associated with a video and their time
+def find_images_with_time(filepath_regex: str):
+    filenames = glob.glob(filepath_regex)
+    rtn  = []
+    for name in filenames:
+        pass
 
 class FileLocator:
     """
@@ -25,6 +36,7 @@ class FileLocator:
 
         self.screenshot_directory = os.path.join(self.output_path, "image")
 
+        self.audio_directory = os.path.join(self.json_directory, self.output_path + "audio")
         self.json_directory = os.path.join(self.output_path, "json")
         self.speech_json_name = os.path.join(self.json_directory, self.file_prefix + "speech.json")
         self.ocr_json_name = os.path.join(self.json_directory, self.file_prefix + "ocr.json")
@@ -77,6 +89,13 @@ class FileLocator:
         :return: directory of search indexes
         """
         return self.index_directory
+
+    def getAudioDirectory(self) -> str:
+        """
+        Sample output: "xxx/audio"
+        :return: directory of search indexes
+        """
+        return self.audio_directory
 
 
 # locator = FileLocator("output.txt", "output/temp")
