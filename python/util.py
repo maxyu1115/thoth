@@ -1,6 +1,4 @@
 import os
-import glob
-
 
 TEXT = "text"
 IMAGE_LOC = "image"
@@ -37,7 +35,6 @@ class FileLocator:
         self.screenshot_directory = os.path.join(self.output_path, "image")
         __make_path_dir__(self.screenshot_directory)
 
-        self.audio_directory = os.path.join(self.json_directory, self.output_path + "audio")
         self.json_directory = os.path.join(self.output_path, "json")
         __make_path_dir__(self.json_directory)
 
