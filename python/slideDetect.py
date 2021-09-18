@@ -1,14 +1,18 @@
 # Standard PySceneDetect imports:
+import json
+
 from scenedetect import VideoManager
 from scenedetect import SceneManager
+from scenedetect.frame_timecode_new import FrameTimecode
 from scenedetect.stats_manager import StatsManager
-from typing import List
+from typing import List, Tuple
 
 from customDetector import StdDetector
 from scenedetect.detectors import ContentDetector, ThresholdDetector
 
 import cv2
 
+import util
 from util import FileLocator
 import pipeline
 
@@ -29,8 +33,11 @@ class SlideDetect(pipeline.ProcessingOperation):
     def process(self, file_locator: FileLocator):
         print("Processing video: ", file_locator.file_pathname)
         scenes, stats = self._find_scenes(file_locator.file_pathname)
-        frame_lst = self.select_frames(scenes, stats, frame_method="middle")
-        return self.export_frames(file_locator, frame_lst)
+        frame_lst, output = self._select_frames(scenes, stats, file_locator, frame_method="middle")
+        self.export_frames(file_locator, frame_lst)
+        # write data to json file
+        with open(file_locator.getDetectJsonName(), "w") as write_file:
+            json.dump(output, write_file)
 
     def _find_scenes(self, video_path):
         # Create our video & scene managers, then add the detector.
@@ -49,22 +56,25 @@ class SlideDetect(pipeline.ProcessingOperation):
         # Each returned scene is a tuple of the (start, end) timecode.
         return scene_manager.get_scene_list(), stats_manager
 
-    @staticmethod
-    def select_frames(scenes, stats_manager: StatsManager, frame_method: str):
-        # Decides which frame in a scene to extract
-        if frame_method == "last":
-            return [x[1].get_frames() - 1 for x in scenes]
-        elif frame_method == "first":
-            return [x[0].get_frames() for x in scenes]
-        elif frame_method == "middle":
-            return [(x[0].get_frames() + x[1].get_frames()) // 2 for x in scenes]
-        elif frame_method == "smart":
-            return []
-        return []
+    def _select_frames(self, scenes: List[Tuple[FrameTimecode, FrameTimecode]],
+                       stats_manager: StatsManager, file_locator: FileLocator, frame_method: str):
+        output = [file_locator.file_pathname]
+        frame_lst = []
+        for s, f in scenes:
+            start_time = int(s.get_seconds() * 1000)
+            end_time = int(f.get_seconds() * 1000)
+            image_frame = self.get_best_frame(s.get_frames(), f.get_frames(), stats_manager, frame_method)
+            frame_lst.append(image_frame)
+
+            image_time = int(image_frame * 1000 / s.get_framerate())
+            image_path = file_locator.getScreenshotName(image_time)
+            output.append(util.make_detect_dict(start_time, end_time, image_time, image_path))
+
+        return frame_lst, output
 
     @staticmethod
-    def export_frames(file_locater: FileLocator, frames: List[int]):
-        cap = cv2.VideoCapture(file_locater.file_pathname)
+    def export_frames(file_locator: FileLocator, frames: List[int]):
+        cap = cv2.VideoCapture(file_locator.file_pathname)
 
         # Find OpenCV version and then get FPS
         (major_ver, minor_ver, subminor_ver) = cv2.__version__.split('.')
@@ -75,22 +85,35 @@ class SlideDetect(pipeline.ProcessingOperation):
 
         i = 0
         while cap.isOpened() and i < len(frames):
-            j = frames[i]
-            cap.set(1, j)
+            frame_num = frames[i]
+            cap.set(1, frame_num)
             ret, frame = cap.read()
             if not ret:
                 break
-            out_path = file_locater.getScreenshotName(j * 1000 // fps)
+            out_path = file_locator.getScreenshotName(frame_num * 1000 // fps)
             cv2.imwrite(out_path, frame)
             i += 1
 
         cap.release()
         cv2.destroyAllWindows()
 
+    @staticmethod
+    def get_best_frame(start_frame: int, end_frame: int, states_manager: StatsManager, frame_method="smart"):
+        if frame_method == "last":
+            return end_frame
+        elif frame_method == "first":
+            return start_frame
+        elif frame_method == "middle":
+            return (start_frame + end_frame) // 2
+        elif frame_method == "smart":
+            return (start_frame + end_frame) // 2
+
 
 # Testing slideDetect
+import os
+
 if __name__ == "__main__":
     filename = "test/SlideChangeTest1.mov"
-    locator = FileLocator(filename, "/output2/temp")
+    locator = FileLocator(filename, os.getcwd() + "/output3/temp")
     detect = SlideDetect("unanimated_slides")
     detect.process(locator)

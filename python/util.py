@@ -4,6 +4,7 @@ TEXT = "text"
 IMAGE_LOC = "image"
 START_TIME = "start_time"
 END_TIME = "end_time"
+IMAGE_TIME = "image_time"
 
 
 def make_ocr_dict(start_time: int, text: str, image_location: str):
@@ -11,6 +12,10 @@ def make_ocr_dict(start_time: int, text: str, image_location: str):
 
 def make_transcribe_dict(start_time: int, text: str, image_location: str, end_time):
     return {START_TIME: start_time, TEXT: text, IMAGE_LOC: image_location, END_TIME: end_time}
+
+def make_detect_dict(start_time: int, end_time: int, image_time: int, image_location: str):
+    return {START_TIME: start_time, END_TIME: end_time, IMAGE_TIME: image_time, IMAGE_LOC: image_location}
+
 
 def __make_path_dir__(path_name: str):
     if not os.path.exists(path_name):
@@ -21,6 +26,7 @@ class FileLocator:
     """
     File locator utility class
     """
+
     def __init__(self, file_pathname: str, output_path: str):
         self.file_pathname = file_pathname
         self.file_name = os.path.basename(file_pathname)
@@ -104,7 +110,6 @@ class FileLocator:
         :return: directory for audio
         """
         return self.audio_directory
-
 
 # locator = FileLocator("output.txt", "output/temp")
 # print(locator.getScreenshotDirectory())
