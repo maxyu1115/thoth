@@ -20,7 +20,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "extraResource": ["./binaries/file"]
+        "extraResource": ["./binaries/file", "./binaries/thoth_engine"]
       },
       "makers": [
         {

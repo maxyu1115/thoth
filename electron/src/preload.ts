@@ -6,8 +6,8 @@ import { promisify } from 'util';
 const execFilePromise = promisify(execFile);
 
 const runThoth = (filepath: string) => {
-    const command = path.join(process.resourcesPath, "file");
-    const args = ["-b", filepath];
+    const command = path.join(process.resourcesPath, "thoth_engine");
+    const args = ["--target", filepath];
 
     return execFilePromise(command, args);
 }
