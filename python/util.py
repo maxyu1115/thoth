@@ -12,7 +12,7 @@ def make_ocr_dict(start_time: int, text: str, image_location: str):
 
 def __make_path_dir__(path_name: str):
     if not os.path.exists(path_name):
-        os.mkdir(path_name)
+        os.makedirs(path_name)
 
 
 class FileLocator:
