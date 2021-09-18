@@ -1,13 +1,9 @@
-from scenedetect import VideoManager
 # Standard PySceneDetect imports:
 from scenedetect import VideoManager
 from scenedetect import SceneManager
 
 from scenedetect.scene_detector import SceneDetector
-from scenedetect import ContentDetector
 import numpy as np
-
-sd = []
 
 
 class StdDetector(SceneDetector):
@@ -26,10 +22,10 @@ class StdDetector(SceneDetector):
         self.height, self.width = None, None
         self.last_frames = []
         self.averaged_frames = []
-        self.last_scene_cut = 0
+        self.last_scene_cut = None
 
     def get_metrics(self):
-        return ContentDetector.METRIC_KEYS
+        return StdDetector.METRIC_KEYS
 
     def is_processing_required(self, frame_num):
         return self.stats_manager is None or (
@@ -76,9 +72,9 @@ class StdDetector(SceneDetector):
 
         # Start computing std of list of averaged frames
         score = self.calculate_std(frame_num)
-        sd.append(score)
         if score > self.threshold:
-            cut_list = [self.last_scene_cut, frame_num]
+            if self.last_scene_cut is not None:
+                cut_list = [self.last_scene_cut, frame_num]
             self.last_scene_cut = frame_num
         return cut_list
 
@@ -102,20 +98,3 @@ def find_scenes(video_path, threshold=30.0):
 
     # Each returned scene is a tuple of the (start, end) timecode.
     return scene_manager.get_scene_list()
-
-
-scenes = find_scenes('test/SlideChangeTest1.mov')
-
-with open('your_file.txt', 'w') as f:
-    for item in sd:
-        f.write("%s\n" % item)
-
-import matplotlib.pyplot as plt
-
-
-print()
-plt.plot(range(0, len(sd)), sd)
-plt.title('title name')
-plt.xlabel('xAxis name')
-plt.ylabel('yAxis name')
-plt.show()
