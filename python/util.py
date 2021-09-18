@@ -14,12 +14,10 @@ def make_ocr_dict(start_time: int, text: str, image_location: str):
 def make_transcribe_dict(start_time: int, text: str, image_location: str, end_time):
     return {START_TIME: start_time, TEXT: text, IMAGE_LOC: image_location, END_TIME: end_time}
 
-# Returns a list of image name associated with a video and their time
-def find_images_with_time(filepath_regex: str):
-    filenames = glob.glob(filepath_regex)
-    rtn  = []
-    for name in filenames:
-        pass
+def __make_path_dir__(path_name: str):
+    if not os.path.exists(path_name):
+        os.makedirs(path_name)
+
 
 class FileLocator:
     """
@@ -32,16 +30,26 @@ class FileLocator:
         if len(filename_list) != 2:
             raise Exception("Bad file name format! ")
         self.file_prefix = str.format("{}_{}_", filename_list[0], filename_list[1])
+
         self.output_path = output_path
+        __make_path_dir__(self.output_path)
 
         self.screenshot_directory = os.path.join(self.output_path, "image")
+        __make_path_dir__(self.screenshot_directory)
 
         self.audio_directory = os.path.join(self.json_directory, self.output_path + "audio")
         self.json_directory = os.path.join(self.output_path, "json")
+        __make_path_dir__(self.json_directory)
+
+        self.detect_json_name = os.path.join(self.json_directory, self.file_prefix + "detect.json")
         self.speech_json_name = os.path.join(self.json_directory, self.file_prefix + "speech.json")
         self.ocr_json_name = os.path.join(self.json_directory, self.file_prefix + "ocr.json")
 
         self.index_directory = os.path.join(self.output_path, "idx")
+        __make_path_dir__(self.index_directory)
+
+        self.audio_directory = os.path.join(self.output_path, "audio")
+        __make_path_dir__(self.audio_directory)
 
     def getFilePathName(self) -> str:
         return self.file_pathname
@@ -62,13 +70,13 @@ class FileLocator:
         """
         return self.screenshot_directory
 
-    def getScreenshotName(self, time_in_seconds: int) -> str:
+    def getScreenshotName(self, time_in_milliseconds: int) -> str:
         """
         Sample output: "xxx/image/test_mp4_1034.png"
-        :param time_in_seconds: time of screenshot in seconds
+        :param time_in_milliseconds: time of screenshot in milliseconds
         :return: name of screenshot at time t
         """
-        return os.path.join(self.screenshot_directory, self.file_prefix + str(time_in_seconds) + ".png")
+        return os.path.join(self.screenshot_directory, self.file_prefix + str(time_in_milliseconds) + ".png")
 
     def getJsonDirectory(self) -> str:
         """
@@ -76,6 +84,9 @@ class FileLocator:
         :return: directory of jsons
         """
         return self.json_directory
+
+    def getDetectJsonName(self) -> str:
+        return self.detect_json_name
 
     def getSpeechJsonName(self) -> str:
         return self.speech_json_name
@@ -93,7 +104,7 @@ class FileLocator:
     def getAudioDirectory(self) -> str:
         """
         Sample output: "xxx/audio"
-        :return: directory of search indexes
+        :return: directory for audio
         """
         return self.audio_directory
 
