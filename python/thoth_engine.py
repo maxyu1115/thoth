@@ -1,12 +1,14 @@
 import argparse
-import os
-import cv2
 import pipeline
 import util
+import slideDetect
 import ocr
+import video_to_text
+import whooshWrapper
 
 parser = argparse.ArgumentParser(description='Run the thoth pipeline. ')
 parser.add_argument('--vid', type=str, help='location of the video')
+parser.add_argument('--animated', type=bool, help='whether slides are animated or not')
 parser.add_argument('--target', type=str, help='location of output folder')
 
 args = parser.parse_args()
@@ -14,12 +16,10 @@ args = parser.parse_args()
 
 def setupPipeline():
     processor = pipeline.Pipeline()
-    # TODO: add std detect here
-
+    processor.addOperation(slideDetect.SlideDetect("animated_slides" if args.animated else "unanimated_slides"))
     processor.addOperation(ocr.OCR())
-
-    # TODO: add speech2text here
-    # TODO: add whoosh indexing here
+    processor.addOperation(video_to_text.VideoToTextProcessOperation())
+    processor.addOperation(whooshWrapper.Indexer())
     return processor
 
 
