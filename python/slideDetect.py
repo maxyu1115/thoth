@@ -110,8 +110,10 @@ class SlideDetect(pipeline.ProcessingOperation):
 
 
 # Testing slideDetect
+import os
+
 if __name__ == "__main__":
     filename = "test/SlideChangeTest1.mov"
-    locator = FileLocator(filename, "/output3/temp")
+    locator = FileLocator(filename, os.getcwd() + "/output3/temp")
     detect = SlideDetect("unanimated_slides")
     detect.process(locator)
