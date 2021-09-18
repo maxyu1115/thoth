@@ -9,6 +9,14 @@ import pipeline
 import json
 
 
+class SearchValue:
+    def __init__(self, video_name: str, video_path: str, timestamp: int, content: str):
+        self.video_name = video_name
+        self.video_path = video_path
+        self.timestamp = timestamp
+        self.content = content
+
+
 BASIC_INDEX = "basic index"
 BASIC_SCHEMA = Schema(video_name=TEXT(stored=True), video_path=ID(stored=True), timestamp=NUMERIC(stored=True), content=TEXT(stored=True))
 
@@ -34,11 +42,14 @@ class WhooshWrapper:
     def __init__(self, locator: util.DirectoryLocator, index_name=BASIC_INDEX, schema=BASIC_SCHEMA):
         self.ix: index = initWhoosh(locator, index_name=index_name, schema=schema)
 
-    def searchWhoosh(self, phrase: str, page_num=1, pagelen=10) -> ResultsPage:
+    def searchWhoosh(self, phrase: str, page_num=1, pagelen=10) -> list[dict]:
         with self.ix.searcher() as searcher:
             query = QueryParser(CONTENT, BASIC_SCHEMA).parse(phrase)
             page_results = searcher.search_page(query, page_num, pagelen=pagelen)
-            return page_results.results
+            output = []
+            for hit in page_results.results:
+                output.append(SearchValue(hit[VIDEO_NAME], hit[VIDEO_PATH], hit[TIMESTAMP], hit[CONTENT]).__dict__)
+            return output
 
     def createIndex(self, video_name: str, video_path: str, timestamp: int,  content: str) -> None:
         writer = self.ix.writer()

@@ -6,7 +6,11 @@ import ocr
 import video_to_text
 import whooshWrapper
 
+import thothSearchServer
+
 parser = argparse.ArgumentParser(description='Run the thoth pipeline. ')
+parser.add_argument('-s', action="store_true", help='run server')
+parser.add_argument('--port', type=int, default=8080, help='run server on specified port, default 8080')
 parser.add_argument('--vid', type=str, help='location of the video')
 parser.add_argument('--animated', type=bool, help='whether slides are animated or not')
 parser.add_argument('--target', type=str, help='location of output folder')
@@ -24,16 +28,15 @@ def setupPipeline():
 
 
 def main():
-    # do stuff here
-    # with open(os.path.join(args.target, "your_file.txt"), 'w') as f:
-    #     f.write("TEST!!!\n")
+    if args.s:
+        thothSearchServer.startServer(args.target, args.port)
+    else:
+        # setup pipeline
+        processor = setupPipeline()
 
-    # setup pipeline
-    processor = setupPipeline()
+        locator = util.FileLocator(args.vid, args.target)
 
-    locator = util.FileLocator(args.vid, args.target)
-
-    processor.processVideo(locator)
+        processor.processVideo(locator)
     return
 
 
