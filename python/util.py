@@ -10,6 +10,11 @@ def make_ocr_dict(start_time: int, text: str, image_location: str):
     return {START_TIME: start_time, TEXT: text, IMAGE_LOC: image_location}
 
 
+def __make_path_dir__(path_name: str):
+    if not os.path.exists(path_name):
+        os.mkdir(path_name)
+
+
 class FileLocator:
     """
     File locator utility class
@@ -21,15 +26,24 @@ class FileLocator:
         if len(filename_list) != 2:
             raise Exception("Bad file name format! ")
         self.file_prefix = str.format("{}_{}_", filename_list[0], filename_list[1])
+
         self.output_path = output_path
+        __make_path_dir__(self.output_path)
 
         self.screenshot_directory = os.path.join(self.output_path, "image")
+        __make_path_dir__(self.screenshot_directory)
 
         self.json_directory = os.path.join(self.output_path, "json")
+        __make_path_dir__(self.json_directory)
+
         self.speech_json_name = os.path.join(self.json_directory, self.file_prefix + "speech.json")
         self.ocr_json_name = os.path.join(self.json_directory, self.file_prefix + "ocr.json")
 
         self.index_directory = os.path.join(self.output_path, "idx")
+        __make_path_dir__(self.index_directory)
+
+        self.audio_directory = os.path.join(self.output_path, "audio")
+        __make_path_dir__(self.audio_directory)
 
     def getFilePathName(self) -> str:
         return self.file_pathname
@@ -77,6 +91,13 @@ class FileLocator:
         :return: directory of search indexes
         """
         return self.index_directory
+
+    def getAudioDirectory(self) -> str:
+        """
+        Sample output: "xxx/audio"
+        :return: directory for audio
+        """
+        return self.audio_directory
 
 
 # locator = FileLocator("output.txt", "output/temp")
