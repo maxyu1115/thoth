@@ -4,10 +4,10 @@ from cv2 import VideoCapture
 
 import util
 from util import FileLocator
-
-import glob
-import json
 import pipeline
+
+# import glob
+import json
 
 
 def extractText(image_location: str, preprocess: str = "none") -> str:
@@ -27,12 +27,17 @@ def extractText(image_location: str, preprocess: str = "none") -> str:
 
 
 class OCR(pipeline.ProcessingOperation):
-    def process(self, file_locator: FileLocator) -> VideoCapture:
+    def process(self, file_locator: FileLocator):
         # Don't do anything to the video. Instead read the screenshots and
-        filenames = glob.glob(file_locator.getScreenshotDirectory() + "/" + file_locator.getFilePrefix() + "*")
+        # filenames = glob.glob(file_locator.getScreenshotDirectory() + "/" + file_locator.getFilePrefix() + "*")
         output_json_name = file_locator.getOCRJsonName()
-        output = []
-        for filename in filenames:
+        output = [file_locator.file_pathname]
+
+        with open(file_locator.getDetectJsonName(), "r") as read_file:
+            slice_data = json.load(read_file)
+
+        for slice in slice_data:
+            filename = slice[util.IMAGE_LOC]
             text = extractText(filename)
             # parse start time from screenshot file name
             start_time = int((filename.split("_")[-1]).split(".")[0])
@@ -42,7 +47,6 @@ class OCR(pipeline.ProcessingOperation):
         with open(output_json_name, "w") as write_file:
             json.dump(output, write_file)
 
-        return
 
 # filename = "/video_mp4_1003.png"
 # print(int((filename.split("_")[-1]).split(".")[0]))

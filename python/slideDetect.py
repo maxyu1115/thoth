@@ -1,9 +1,8 @@
 # Standard PySceneDetect imports:
 import json
 
-from scenedetect import VideoManager
+from scenedetect import VideoManager, FrameTimecode
 from scenedetect import SceneManager
-from scenedetect.frame_timecode_new import FrameTimecode
 from scenedetect.stats_manager import StatsManager
 from typing import List, Tuple
 
@@ -33,7 +32,7 @@ class SlideDetect(pipeline.ProcessingOperation):
     def process(self, file_locator: FileLocator):
         print("Processing video: ", file_locator.file_pathname)
         scenes, stats = self._find_scenes(file_locator.file_pathname)
-        frame_lst, output = self._select_frames(scenes, stats, file_locator, frame_method="middle")
+        frame_lst, output = self._select_frames(scenes, stats, file_locator, frame_method="smart")
         self.export_frames(file_locator, frame_lst)
         # write data to json file
         with open(file_locator.getDetectJsonName(), "w") as write_file:
@@ -58,7 +57,7 @@ class SlideDetect(pipeline.ProcessingOperation):
 
     def _select_frames(self, scenes: List[Tuple[FrameTimecode, FrameTimecode]],
                        stats_manager: StatsManager, file_locator: FileLocator, frame_method: str):
-        output = [file_locator.file_pathname]
+        output = []
         frame_lst = []
         for s, f in scenes:
             start_time = int(s.get_seconds() * 1000)
@@ -97,8 +96,7 @@ class SlideDetect(pipeline.ProcessingOperation):
         cap.release()
         cv2.destroyAllWindows()
 
-    @staticmethod
-    def get_best_frame(start_frame: int, end_frame: int, states_manager: StatsManager, frame_method="smart"):
+    def get_best_frame(self, start_frame: int, end_frame: int, stats_manager: StatsManager, frame_method="smart"):
         if frame_method == "last":
             return end_frame
         elif frame_method == "first":
@@ -106,7 +104,13 @@ class SlideDetect(pipeline.ProcessingOperation):
         elif frame_method == "middle":
             return (start_frame + end_frame) // 2
         elif frame_method == "smart":
-            return (start_frame + end_frame) // 2
+            valid_frames = []
+            for frame, val_dict in stats_manager._frame_metrics.items():
+                if start_frame <= frame < end_frame:
+                    score = val_dict[self.detector.FRAME_SCORE_KEY]
+                    if score is not None:
+                        valid_frames.append((frame, score))
+            return sorted(valid_frames, key=lambda x: (x[0], -x[1]))[0][0]
 
 
 # Testing slideDetect
