@@ -6,8 +6,11 @@ parser.add_argument('--target', type=str, help='location of output folder')
 
 args = parser.parse_args()
 
+
 def main():
     # do stuff here
+    return
+
 
 if __name__ == '__main__':
     main()
