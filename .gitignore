@@ -1,6 +1,8 @@
 videos
 audios
 
+test/*/
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,node,react,pycharm,visualstudiocode,pycharm+all
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,node,react,pycharm,visualstudiocode,pycharm+all
 
