@@ -57,7 +57,7 @@ class SlideDetect(pipeline.ProcessingOperation):
 
     def _select_frames(self, scenes: List[Tuple[FrameTimecode, FrameTimecode]],
                        stats_manager: StatsManager, file_locator: FileLocator, frame_method: str):
-        output = [file_locator.file_pathname]
+        output = []
         frame_lst = []
         for s, f in scenes:
             start_time = int(s.get_seconds() * 1000)
