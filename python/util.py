@@ -36,6 +36,7 @@ class FileLocator:
         self.json_directory = os.path.join(self.output_path, "json")
         __make_path_dir__(self.json_directory)
 
+        self.detect_json_name = os.path.join(self.json_directory, self.file_prefix + "detect.json")
         self.speech_json_name = os.path.join(self.json_directory, self.file_prefix + "speech.json")
         self.ocr_json_name = os.path.join(self.json_directory, self.file_prefix + "ocr.json")
 
@@ -78,6 +79,9 @@ class FileLocator:
         :return: directory of jsons
         """
         return self.json_directory
+
+    def getDetectJsonName(self) -> str:
+        return self.detect_json_name
 
     def getSpeechJsonName(self) -> str:
         return self.speech_json_name
