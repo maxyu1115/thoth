@@ -91,17 +91,19 @@ class DirectoryLocator:
         """
         return self.audio_directory
 
+    def getOutputRoot(self) -> str:
+        return self.output_path
+
 
 class FileLocator(DirectoryLocator):
     """
     File locator utility class
     """
 
-    def __init__(self, file_pathname: str, output_path: str):
+    def __init__(self, filename: str, output_path: str):
         super().__init__(output_path)
-        self.file_pathname = file_pathname
-        self.file_name = os.path.basename(file_pathname)
-        filename_list = self.file_name.split(".")
+        self.filename = filename
+        filename_list = self.filename.split(".")
         if len(filename_list) != 2:
             raise Exception("Bad file name format! ")
         self.file_prefix = str.format("{}_{}_", filename_list[0], filename_list[1])
@@ -110,14 +112,8 @@ class FileLocator(DirectoryLocator):
         self.speech_json_name = self.makeJsonPathname(self.file_prefix + "speech.json")
         self.ocr_json_name = self.makeJsonPathname(self.file_prefix + "ocr.json")
 
-    def getFilePathName(self) -> str:
-        return self.file_pathname
-
     def getFileName(self) -> str:
-        return self.file_name
-
-    def getOutputRoot(self) -> str:
-        return self.output_path
+        return self.filename
 
     def getFilePrefix(self) -> str:
         return self.file_prefix
