@@ -39,6 +39,27 @@ const TabPanel = ({
   );
 };
 
+const TabPanelWithNoPadding = ({
+  children,
+  index,
+  value,
+}: {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}): JSX.Element => {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`thoth-tabpanel-${index}`}
+      aria-labelledby={`thoth-tabpanel-${index}`}
+    >
+      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
+    </div>
+  );
+};
+
 const App = (): JSX.Element => {
   const [value, setValue] = useState(0);
   const [videoUrl, setVideoUrl] = useState('');
@@ -100,6 +121,7 @@ const App = (): JSX.Element => {
                 controls: true,
                 sources: [{ src: videoUrl, type: 'video/mp4' }],
               }}
+              curTime={0}
             />
             <Button
               onClick={() => playerRef.current?.currentTime(87)}
@@ -129,9 +151,9 @@ const App = (): JSX.Element => {
           ]}
         />
       </TabPanel>
-      <TabPanel value={value} index={3}>
+      <TabPanelWithNoPadding value={value} index={3}>
         <SearchPanel></SearchPanel>
-      </TabPanel>
+      </TabPanelWithNoPadding>
       <TabPanel value={value} index={4}>
         <MyDropzone />
       </TabPanel>

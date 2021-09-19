@@ -6,9 +6,11 @@ import 'video.js/dist/video-js.css';
 export const VideoPlayer = ({
   onReady,
   options,
+  curTime,
 }: {
   onReady?: (player: VideoJsPlayer) => void;
   options?: VideoJsPlayerOptions;
+  curTime?: number;
 }): JSX.Element => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playerRef = useRef<VideoJsPlayer | null>(null);
@@ -21,7 +23,7 @@ export const VideoPlayer = ({
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
         console.log('Player is ready!');
-        onReady?.(player);
+        player.currentTime(curTime??0)
       }));
     }
   }, [options]);
