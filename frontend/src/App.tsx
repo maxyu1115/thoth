@@ -72,9 +72,8 @@ const App = (): JSX.Element => {
           aria-label="basic options for thoth"
         >
           <Tab label="Upload Video" {...a11yProps(0)} />
-          <Tab label="View Transcript" {...a11yProps(1)} />
-          <Tab label="View Slides" {...a11yProps(2)} />
-          <Tab label="Key Word Search" {...a11yProps(3)} />
+          <Tab label="View Slides" {...a11yProps(1)} />
+          <Tab label="Key Word Search" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -83,12 +82,9 @@ const App = (): JSX.Element => {
         />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
-      </TabPanel>
-      <TabPanel value={value} index={2}>
         <SlidePanel videoName={videoName} />
       </TabPanel>
-      <TabPanelWithNoPadding value={value} index={3}>
+      <TabPanelWithNoPadding value={value} index={2}>
         <SearchPanel></SearchPanel>
       </TabPanelWithNoPadding>
     </Box>
