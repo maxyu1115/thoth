@@ -44,7 +44,6 @@ const SearchPanel = () => {
     }
   };
 
-<<<<<<< HEAD
     return (
         <Box sx={{ flexGrow: 1, margin: 0, padding:0, }}>
             <SearchAppBar callBack={searchHandler}></SearchAppBar>
@@ -53,17 +52,6 @@ const SearchPanel = () => {
         </Box>
     )
 }
-=======
-  return (
-    <div>
-      <SearchAppBar callBack={searchHandler}></SearchAppBar>
-      {searching && (
-        <SearchResultContainer searchResult={lst}></SearchResultContainer>
-      )}
-    </div>
-  );
-};
->>>>>>> 3cb19b2806fcd51326f83fe54e7d34b860a8429b
 
 function SearchAppBar(props) {
   const search = props.callBack;
@@ -110,7 +98,6 @@ const SearchResultContainer = (props) => {
   const [video, setVideo] = useState(false);
   const [path, setPath] = useState('');
 
-<<<<<<< HEAD
     const getVideoHandler = async (n) => {
         const name = n
         console.log(name)
@@ -156,20 +143,6 @@ const SearchResultContainer = (props) => {
         </Box>
     )
 }
-=======
-  const getVideoHandler = async (e) => {
-    const name = e.target.innerHTML;
-    console.log(name);
-    setVideo(true);
-    setPath('http://10.119.176.254:8000/storage/' + name);
-    console.log(path);
-    const response = await fetch('http://10.119.176.254:8000/storage/' + name, {
-      method: 'GET',
-    });
-    const j = await response.json();
-    console.log(j);
-  };
->>>>>>> 3cb19b2806fcd51326f83fe54e7d34b860a8429b
 
   for (const search of searchResult) {
     toRender.push(
@@ -233,7 +206,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-<<<<<<< HEAD
       width: 'auto',
     },
   }));
@@ -271,11 +243,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         '&:focus': {
           width: '20ch',
         },
-=======
-      width: '12ch',
-      '&:focus': {
-        width: '20ch',
->>>>>>> 3cb19b2806fcd51326f83fe54e7d34b860a8429b
       },
     },
   },
