@@ -2,6 +2,7 @@ import { Tab, Tabs, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState } from 'react';
 import { CustomDropzone } from './components';
+import SearchPanel from './Search';
 
 const a11yProps = (index: number): any => ({
   id: `thoth-tab-${index}`,
@@ -56,6 +57,7 @@ const App = (): JSX.Element => {
           <Tab label="Upload Video" {...a11yProps(0)} />
           <Tab label="View Transcript" {...a11yProps(1)} />
           <Tab label="View Slides" {...a11yProps(2)} />
+          <Tab label="Key Word Search" {...a11yProps(3)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -70,6 +72,9 @@ const App = (): JSX.Element => {
       </TabPanel>
       <TabPanel value={value} index={2}>
         Item Three
+      </TabPanel>
+      <TabPanel value={value} index={3}>
+        <SearchPanel></SearchPanel>
       </TabPanel>
     </Box>
   );
