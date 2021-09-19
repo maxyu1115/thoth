@@ -7,10 +7,11 @@ const execFilePromise = promisify(execFile);
 
 // eslint-disable-next-line @typescript-eslint/promise-function-async
 export const runThoth = (
-  filepath: string,
+  videoPath: string,
+  outDir: string,
 ): ReturnType<typeof execFilePromise> => {
   const command = path.join(process.resourcesPath, 'thoth_engine');
-  const args = ['--target', filepath];
+  const args = ['--target', videoPath, '--output', outDir];
 
   return execFilePromise(command, args);
 };
@@ -20,4 +21,6 @@ export const getDirname = path.dirname;
 contextBridge.exposeInMainWorld('thoth', {
   runThoth: runThoth,
   getDirname: getDirname,
+  joinPaths: path.join,
+  getBasename: path.basename,
 });

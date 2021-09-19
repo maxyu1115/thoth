@@ -1,31 +1,65 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, StrictMode, useState } from 'react';
 import { render } from 'react-dom';
-import { getDirname, runThoth } from './preload';
-import { CustomDropzone } from './components';
+import { ipcRenderer } from 'electron';
+import { CustomDropzone, Slides, VideoPlayer } from './components';
+
+import './app.css';
+
+const custom = window.thoth;
+
+const outputDir = custom.joinPaths('/tmp', 'json');
 
 const App = (): JSX.Element => {
   const [fileName, setFileName] = useState('');
-  const [output, setOutput] = useState('');
+  const [ocrPath, setOcrPath] = useState('');
+  const [speechPath, setSpeechPath] = useState('');
+  const [showVideo, setShowVideo] = useState(false);
+  const [tempPath, setTempPath] = useState('');
 
   const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
-    window.thoth
-      .runThoth(window.thoth.getDirname(fileName))
-      .then((result) => setOutput(result.stdout.toString()))
-      .catch((reason) =>
-        setOutput(`Command failed: ${JSON.stringify(reason)}`),
-      );
+
+    ipcRenderer
+      .invoke('get-temp-path')
+      .then(async (path) => {
+        setTempPath(path);
+        return await custom.runThoth(fileName, path);
+      })
+      .then(() => ipcRenderer.invoke('get-result-dir'))
+      .then((resultPath) => {
+        setShowVideo(true);
+        setOcrPath(`${resultPath}${fileName.replace('.', '-')}-ocr.json`);
+        setSpeechPath(`${resultPath}${fileName.replace('.', '-')}-speech.json`);
+      })
+      .catch((reason) => {
+        console.error(JSON.stringify(reason));
+      });
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <CustomDropzone setter={setFileName} />
-        <input type="submit" value="Submit" />
-      </form>
-      {output !== '' && <p>{output}</p>}
-    </>
+    <div className="container">
+      <div className="video">
+        {showVideo ? (
+          <form onSubmit={handleSubmit}>
+            <CustomDropzone setter={setFileName} />
+            <input type="submit" value="Submit" />
+          </form>
+        ) : (
+          <VideoPlayer />
+        )}
+      </div>
+      <div className="transcript" style={{ backgroundColor: 'green' }}></div>
+      <div
+        className="slides"
+        style={{ backgroundColor: 'cornflowerblue' }}
+      ></div>
+    </div>
   );
 };
 
-render(<App />, document.getElementById('app'));
+render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+  document.getElementById('app'),
+);
