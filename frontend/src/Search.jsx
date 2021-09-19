@@ -105,14 +105,14 @@ const SearchResultContainer = (props) => {
         setVideo(true);
         setPath("http://10.119.176.254:8000/storage/" + name)
         console.log(path)
-        const response = await fetch(
-            "http://10.119.176.254:8000/storage/" + name,
-            {
-                method : 'GET',
-            }
-        ) 
-        const j = await response.json()
-        console.log(j)
+        // const response = await fetch(
+        //     "http://10.119.176.254:8000/storage/" + name,
+        //     {
+        //         method : 'GET',
+        //     }
+        // ) 
+        // const j = await response.json()
+        // console.log(j)
         
     }
 
@@ -130,12 +130,12 @@ const SearchResultContainer = (props) => {
                 {toRender}
             </List>
             {video &&
-            <Container maxWidth="sm">
-                <video width="320" height="240" controls>
-                    <source src="http://10.119.176.254:8000/storage/test3.mp4" type="video/mp4" />
+            <VideoContainer maxWidth="sm">
+                <video width="800" height="600" controls>
+                    <source src={path} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
-            </Container>
+            </VideoContainer>
             }       
         </Box>
     )
@@ -167,6 +167,17 @@ const Search = styled('div')(({ theme }) => ({
     justifyContent: 'center',
   }));
   
+  const VideoContainer = styled('div')(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    float: "right",
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'right',
+  }));
+
   const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'inherit',
     '& .MuiInputBase-input': {
