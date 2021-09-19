@@ -1,4 +1,6 @@
 import subprocess
+from multiprocessing import Pool
+
 import util
 from util import bcolors
 import json
@@ -16,20 +18,22 @@ json_convert_progress = "filename: {0} \n text : {1} \n start_time : {2} \n end_
 gcp_link = "gs://hackrice-11/{0}"
 bucket_name = "hackrice-11"
 
+
 # from .mp4 to .flac with single channel
-class VideoToTextProcessOperation(ProcessingOperation):
+class VideoToTextTranscriber(ProcessingOperation):
+    """
+    Extracts the audio, then calls GCP to transcribe the speech to text asynchronously
+    """
 
     def __init__(self) -> None:
         super().__init__()
         self.file_locator = None
         self.word_list = []
+        self.pool = Pool()
 
-    def setLocator(self, locator):
-        self.file_locator = locator
-
-    def process(self, file_locator: util.FileLocator) -> None:
+    def process(self, file_locator: util.FileLocator, context: dict) -> None:
         self.file_locator = file_locator
-        return self.get_speech_from_video()
+        context["word_lst"] = self.pool.apply_async(self.get_speech_from_video, args=(file_locator,))
         # self.assemble_words_by_slides(word_list)
 
     def postProcess(self) -> None:
@@ -111,8 +115,23 @@ class VideoToTextProcessOperation(ProcessingOperation):
         blob_name = self.upload_to_cloud(audio_name)
         return self.transcribe_file(gcp_link.format(blob_name), audio_name)
 
-    def assemble_words_by_slides(self, word_list):
-        detect_json_path = self.file_locator.getDetectJsonName()
+
+class VideoToTextAssembler(ProcessingOperation):
+    """
+    Waits for GCP to transcribe the speech to text, and assemble to output
+    """
+
+    def process(self, file_locator: util.FileLocator, context: dict) -> None:
+        # wait on the async task
+        word_lst = context["word_lst"].get()
+        return self.assemble_words_by_slides(file_locator, word_lst)
+
+    def postProcess(self, file_locator: util.FileLocator) -> None:
+        util.cleanDir(file_locator.getAudioDirectory())
+
+    @staticmethod
+    def assemble_words_by_slides(self, file_locator: util.FileLocator, word_list):
+        detect_json_path = file_locator.getDetectJsonName()
         # Opening JSON file
         jfile = open(detect_json_path,)
         
@@ -121,8 +140,8 @@ class VideoToTextProcessOperation(ProcessingOperation):
         slides = json.load(jfile)
         str = ""
         idx = 0
-        output = [self.file_locator.getFilePathName()]
-        output_json_name = self.file_locator.getSpeechJsonName()
+        output = [file_locator.getFilePathName()]
+        output_json_name = file_locator.getSpeechJsonName()
 
         # print("word list", word_list[:20])
         # print("json time", output)

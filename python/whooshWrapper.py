@@ -73,7 +73,7 @@ class Indexer(pipeline.ProcessingOperation):
             for slice in slice_data:
                 self.whoosh.createIndex(file_locator.file_name, file_locator.file_pathname, slice[util.START_TIME], slice[util.TEXT])
 
-    def process(self, file_locator: util.FileLocator) -> None:
+    def process(self, file_locator: util.FileLocator, context: dict) -> None:
         self.whoosh = WhooshWrapper(file_locator)
         self._processListIndex(file_locator, [file_locator.getSpeechJsonName(), file_locator.getOCRJsonName()])
 
