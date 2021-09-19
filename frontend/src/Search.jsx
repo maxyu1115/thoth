@@ -129,13 +129,17 @@ const SearchResultContainer = (props) => {
 }
 
 const SearchResultEntry = (props) => {
-    const time = props.data.timestamp
-    const videoName = props.data.video_name
-    return (
-        <div>
-            <div><p>{videoName} ":" {time} </p></div>
-        </div>
-    )
-}
+  const time = props.data.timestamp;
+  const videoName = props.data.video_name;
+  return (
+    <div>
+      <div>
+        <p>
+          {videoName} ":" {time}{' '}
+        </p>
+      </div>
+    </div>
+  );
+};
 
 export default SearchPanel;
