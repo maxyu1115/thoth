@@ -1,6 +1,6 @@
 import { uploadVideo } from '../dataloader';
 import React, { useMemo } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { DropEvent, useDropzone } from 'react-dropzone';
 
 const baseStyle = {
   flex: 1,
@@ -33,11 +33,9 @@ const rejectStyle = {
 };
 
 export const CustomDropzone = ({
-  setter,
-  isAnimated,
+  onDropAccepted,
 }: {
-  setter: (input: string) => void;
-  isAnimated: boolean;
+  onDropAccepted?: <T extends File>(files: T[], event: DropEvent) => void;
 }): JSX.Element => {
   const {
     getRootProps,
@@ -48,16 +46,7 @@ export const CustomDropzone = ({
   } = useDropzone({
     accept: ['video/*'],
     maxFiles: 1,
-    onDropAccepted: (files, event): void => {
-      event.preventDefault();
-
-      uploadVideo(files?.[0], isAnimated)
-        .then((result) => console.log(result))
-        .catch(() => {});
-
-      const url = URL.createObjectURL(files?.[0]);
-      setter(url);
-    },
+    onDropAccepted: onDropAccepted,
   });
 
   const style = useMemo(

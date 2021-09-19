@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://10.119.176.254:8000';
+export const BASE_URL = 'http://10.119.176.254:8000';
 
 export const search = async (
   phrase: string,
@@ -23,16 +23,19 @@ export const search = async (
 
 export const getFileByPath = async (
   path: string,
-): Promise<Blob | { errorReason: string }> => {
-  const request = new Request(new URL(`/storage/${path}`, BASE_URL).href);
-  const options = {
-    method: 'GET',
-  };
-  return await fetch(request, options)
-    .then(async (res) => await res.blob())
-    .catch((error) => ({
-      errorReason: JSON.stringify(error),
-    }));
+): Promise<any | { errorReason: string }> => {
+  return await axios
+    .get(`${BASE_URL}/storage/${path}`)
+    .then((response) => {
+      console.log(response);
+
+      return response;
+    })
+    .catch((reason) => {
+      console.log(reason);
+
+      return { errorReason: reason };
+    });
 };
 
 export const uploadVideo = async (

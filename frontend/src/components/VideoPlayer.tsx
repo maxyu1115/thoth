@@ -23,7 +23,7 @@ export const VideoPlayer = ({
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
         console.log('Player is ready!');
-        player.currentTime(curTime??0)
+        player.currentTime(curTime ?? 0);
       }));
     }
   }, [options]);

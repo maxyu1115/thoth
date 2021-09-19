@@ -45,19 +45,20 @@ const SearchPanel = () => {
     }
   };
 
-    return (
-        <Box sx={{ flexGrow: 1, margin: 0, padding:0, }}>
-            <SearchAppBar callBack={searchHandler}></SearchAppBar>
-            {searching && 
-            <SearchResultContainer searchResult={lst}></SearchResultContainer> }
-        </Box>
-    )
-}
+  return (
+    <Box sx={{ flexGrow: 1, margin: 0, padding: 0 }}>
+      <SearchAppBar callBack={searchHandler}></SearchAppBar>
+      {searching && (
+        <SearchResultContainer searchResult={lst}></SearchResultContainer>
+      )}
+    </Box>
+  );
+};
 
 function SearchAppBar(props) {
   const search = props.callBack;
   return (
-    <Box sx={{ flexGrow: 1, margin: 0, padding:0, }}>
+    <Box sx={{ flexGrow: 1, margin: 0, padding: 0 }}>
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -100,120 +101,134 @@ const SearchResultContainer = (props) => {
   const [path, setPath] = useState('');
   const [time, setTime] = useState(0);
 
-  const handlePlayerReady = (player) => {
-  }
+  const handlePlayerReady = (player) => {};
 
-    const getVideoHandler = async (n, time) => {
-        if (video) {
-            setVideo(false)
-            return
+  const getVideoHandler = async (n, time) => {
+    if (video) {
+      setVideo(false);
+      return;
+    }
+    const name = n;
+    console.log(name);
+    setVideo(true);
+    setPath('http://10.119.176.254:8000/storage/' + name);
+    setTime(time);
+    console.log(path);
+    // const response = await fetch(
+    //     "http://10.119.176.254:8000/storage/" + name,
+    //     {
+    //         method : 'GET',
+    //     }
+    // )
+    // const j = await response.json()
+    // console.log(j)
+  };
+  let keyIndex = 0;
+  for (const search of searchResult) {
+    toRender.push(
+      <ListItem
+        disablePadding
+        key={keyIndex}
+        onClick={(e) =>
+          getVideoHandler(search.video_name, search.timestamp / 1000)
         }
-        const name = n
-        console.log(name)
-        setVideo(true);
-        setPath("http://10.119.176.254:8000/storage/" + name)
-        setTime(time)
-        console.log(path)
-        // const response = await fetch(
-        //     "http://10.119.176.254:8000/storage/" + name,
-        //     {
-        //         method : 'GET',
-        //     }
-        // ) 
-        // const j = await response.json()
-        // console.log(j)
-        
-    }
-    var keyIndex = 0
-    for (const search of searchResult) {
-        toRender.push(<ListItem disablePadding key={keyIndex} 
-            onClick={(e) => getVideoHandler(search.video_name, search.timestamp/1000)}>
-            <ListItemButton key={keyIndex}>
-              <ListItemText primary={search.video_name} key={keyIndex} insect={true} 
-                secondary={"timestamp :" + search.timestamp/1000 + " sec"} />
-            </ListItemButton>
-          </ListItem>)
-        toRender.push(<Divider />)
-        keyIndex += 1
-    }
-    return (
-        <Box sx={{ width: '100%', bgcolor: 'background.paper',display: "flex", flexDirection: "row" }}>
-            <Box sx={{ width: '30%'}}>
-            <List>
-                {toRender}
-            </List>
-            </Box>
-            {video &&
-            <Container maxwidth="sm">
-                {/* <video width="800" height="600" controls={true} autoplay={true}>
+      >
+        <ListItemButton key={keyIndex}>
+          <ListItemText
+            primary={search.video_name}
+            key={keyIndex}
+            insect={true}
+            secondary={'timestamp :' + search.timestamp / 1000 + ' sec'}
+          />
+        </ListItemButton>
+      </ListItem>,
+    );
+    toRender.push(<Divider />);
+    keyIndex += 1;
+  }
+  return (
+    <Box
+      sx={{
+        width: '100%',
+        bgcolor: 'background.paper',
+        display: 'flex',
+        flexDirection: 'row',
+      }}
+    >
+      <Box sx={{ width: '30%' }}>
+        <List>{toRender}</List>
+      </Box>
+      {video && (
+        <Container maxwidth="sm">
+          {/* <video width="800" height="600" controls={true} autoplay={true}>
                     <source src={path} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video> */}
-                <VideoPlayer
-                    onReady={handlePlayerReady}
-                    options={{
-                        fluid: true,
-                        controls: true,
-                        sources: [{ src: path, type: 'video/mp4' }],
-                        width: 800,
-                    }}
-                    curTime={time}
-                    />
-            </Container>
-            }       
-        </Box>
-    )
-}
+          <VideoPlayer
+            onReady={handlePlayerReady}
+            options={{
+              fluid: true,
+              controls: true,
+              sources: [{ src: path, type: 'video/mp4' }],
+              width: 800,
+            }}
+            curTime={time}
+          />
+        </Container>
+      )}
+    </Box>
+  );
+};
 
 const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    padding: 0,
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  padding: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const VideoContainer = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  marginRight: 0,
+  marginLeft: 'auto',
+  height: '100%',
+  position: 'relative',
+  pointerEvents: 'none',
+  display: 'flex',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      width: 'auto',
-    },
-  }));
-  
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-  
-  const VideoContainer = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    marginRight: 0,
-    marginLeft: "auto",
-    height: '100%',
-    position: 'relative',
-    pointerEvents: 'none',
-    display: 'flex',
-  }));
-
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      width: '100%',
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
-        },
+      width: '12ch',
+      '&:focus': {
+        width: '20ch',
       },
     },
-  }));
+  },
+}));
 export default SearchPanel;

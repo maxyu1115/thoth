@@ -1,17 +1,9 @@
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  Tab,
-  Tabs,
-} from '@mui/material';
+import { Tab, Tabs } from '@mui/material';
 import { Box } from '@mui/system';
 import SearchPanel from './Search';
-import { useRef, useState } from 'react';
-import { VideoJsPlayer } from 'video.js';
-import { CustomDropzone, Slides, VideoPlayer } from './components';
-import { MyDropzone } from './components/MyDropzone';
+import { useState } from 'react';
+import { Slides } from './components';
+import { PreviewUpload, SlidePanel } from './pages';
 
 const a11yProps = (index: number): any => ({
   id: `thoth-tab-${index}`,
@@ -62,10 +54,7 @@ const TabPanelWithNoPadding = ({
 
 const App = (): JSX.Element => {
   const [value, setValue] = useState(0);
-  const [videoUrl, setVideoUrl] = useState('');
-  const [isAnimated, setIsAnimated] = useState(false);
-
-  const playerRef = useRef<VideoJsPlayer | null>(null);
+  const [videoName, setVideoName] = useState('');
 
   const handleTabChange = (
     event: React.SyntheticEvent,
@@ -73,10 +62,6 @@ const App = (): JSX.Element => {
   ): void => {
     event.preventDefault();
     setValue(newValue);
-  };
-
-  const handlePlayerReady = (player: VideoJsPlayer): void => {
-    playerRef.current = player;
   };
 
   return (
@@ -91,72 +76,22 @@ const App = (): JSX.Element => {
           <Tab label="View Transcript" {...a11yProps(1)} />
           <Tab label="View Slides" {...a11yProps(2)} />
           <Tab label="Key Word Search" {...a11yProps(3)} />
-          <Tab label="Test Upload" {...a11yProps(4)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
-        {videoUrl === '' ? (
-          <>
-            <FormGroup>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isAnimated}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setIsAnimated(e.target.checked)
-                    }
-                  />
-                }
-                label="Does this video have animated slides?"
-              />
-            </FormGroup>
-            <CustomDropzone isAnimated={isAnimated} setter={setVideoUrl} />
-          </>
-        ) : (
-          <>
-            <VideoPlayer
-              onReady={handlePlayerReady}
-              options={{
-                fluid: true,
-                controls: true,
-                sources: [{ src: videoUrl, type: 'video/mp4' }],
-              }}
-              curTime={0}
-            />
-            <Button
-              onClick={() => playerRef.current?.currentTime(87)}
-              variant="contained"
-            >
-              Skip
-            </Button>
-          </>
-        )}
+        <PreviewUpload
+          onUploadFinish={(name: string): void => setVideoName(name)}
+        />
       </TabPanel>
       <TabPanel value={value} index={1}>
         Item Two
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <Slides
-          slides={[
-            {
-              order: 0,
-              path: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Petauroides_volans.jpg/800px-Petauroides_volans.jpg',
-              text: 'MUCH MUCH MUCH text here',
-            },
-            {
-              order: 1,
-              path: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Our_Lady_of_La_Salette.jpg/1024px-Our_Lady_of_La_Salette.jpg',
-              text: 'Lots of text here too',
-            },
-          ]}
-        />
+        <SlidePanel videoName={videoName} />
       </TabPanel>
       <TabPanelWithNoPadding value={value} index={3}>
         <SearchPanel></SearchPanel>
       </TabPanelWithNoPadding>
-      <TabPanel value={value} index={4}>
-        <MyDropzone />
-      </TabPanel>
     </Box>
   );
 };
