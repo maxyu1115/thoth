@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 import json
 import sys
 import os
+import glob
 
 import whooshWrapper
 import util
@@ -14,21 +15,21 @@ import thoth_engine
 from python.pipeline import Pipeline
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-publicDirectory = os.path.join(BASE_DIR, "storage")
-if not os.path.exists(publicDirectory):
-    os.makedirs(publicDirectory)
+storageDirectory = os.path.join(BASE_DIR, "storage")
+if not os.path.exists(storageDirectory):
+    os.makedirs(storageDirectory)
 
 
 app = Flask(__name__)
 app.secret_key = "secret key"
-app.config['UPLOAD_FOLDER'] = publicDirectory
+app.config['UPLOAD_FOLDER'] = storageDirectory
 app.config['ALLOWED_EXTENSIONS'] = {'mp4', 'avi', 'mov', 'mpeg', 'flv', 'wmv'}
 
-searcher = whooshWrapper.WhooshWrapper(util.DirectoryLocator(app.config['UPLOAD_FOLDER']))
+directory_locator = util.DirectoryLocator(storageDirectory)
+
+searcher = whooshWrapper.WhooshWrapper(directory_locator)
 
 pipelines = dict()
-
-directory_locator = util.DirectoryLocator(publicDirectory)
 
 
 @app.route("/search", methods=["GET"])
@@ -39,11 +40,12 @@ def search():
 
 @app.route("/storage/<path:path>", methods=["GET"])
 def get_file(path):
-    return send_from_directory(publicDirectory, path)
+    return send_from_directory(storageDirectory, path)
 
 
 @app.route("/upload_video", methods=["POST"])
 def upload_video():
+    vid_type = request.args.get('vid-type')
     try:
         if 'file' not in request.files:
             response = {"error": 'No file!'}
@@ -57,7 +59,7 @@ def upload_video():
             filepath = directory_locator.makeJsonPathname(filename)
             file.save(filepath)
             flash("Successfully uploaded video to ", filepath)
-            _thread.start_new_thread(_process_video, (filename,))
+            _thread.start_new_thread(_process_video, (filename, vid_type,))
             return {"filepath": filepath}
     except Exception:
         response = {"error": str(sys.exc_info()[1])}
@@ -66,7 +68,12 @@ def upload_video():
 
 @app.route("/directory-data/<path:path>", methods=["GET"])
 def get_directory_data(path):
-    return ""
+    file_lst = glob.glob(os.path.join(directory_locator.getOutputRoot(), path))
+    output = []
+    for filename in file_lst:
+        if "." in filename:
+            output.append({filename: dict})
+    return json.dumps(output)
 
 
 @app.route("/status/<path:path>", methods=["GET"])
@@ -82,10 +89,10 @@ def _allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config["ALLOWED_EXTENSIONS"]
 
 
-def _process_video(video_name: str):
+def _process_video(video_name: str, vid_type: str):
     # video_name: file name of video
     locator = util.FileLocator(video_name, directory_locator.output_path)
-    pipeline = thoth_engine.createPipeline("animated")
+    pipeline = thoth_engine.createPipeline(vid_type)
     pipelines[video_name] = pipeline
 
     pipeline.processVideo(locator)
