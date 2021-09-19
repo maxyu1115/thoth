@@ -27,7 +27,7 @@ def extractText(image_location: str, preprocess: str = "none") -> str:
 
 
 class OCR(pipeline.ProcessingOperation):
-    def process(self, file_locator: FileLocator):
+    def process(self, file_locator: FileLocator, context: dict) -> None:
         # Don't do anything to the video. Instead read the screenshots and
         # filenames = glob.glob(file_locator.getScreenshotDirectory() + "/" + file_locator.getFilePrefix() + "*")
         output_json_name = file_locator.getOCRJsonName()

@@ -1,4 +1,6 @@
 import os, os.path
+from typing import List
+
 import util
 from whoosh import index
 from whoosh.searching import ResultsPage, Results
@@ -42,7 +44,7 @@ class WhooshWrapper:
     def __init__(self, locator: util.DirectoryLocator, index_name=BASIC_INDEX, schema=BASIC_SCHEMA):
         self.ix: index = initWhoosh(locator, index_name=index_name, schema=schema)
 
-    def searchWhoosh(self, phrase: str, page_num=1, pagelen=10) -> list[dict]:
+    def searchWhoosh(self, phrase: str, page_num=1, pagelen=10) -> List[dict]:
         with self.ix.searcher() as searcher:
             query = QueryParser(CONTENT, BASIC_SCHEMA).parse(phrase)
             page_results = searcher.search_page(query, page_num, pagelen=pagelen)
@@ -62,7 +64,7 @@ class Indexer(pipeline.ProcessingOperation):
         self.whoosh = None
         pass
 
-    def _processListIndex(self, file_locator: util.FileLocator, filenames: list[str]):
+    def _processListIndex(self, file_locator: util.FileLocator, filenames: List[str]):
         for filename in filenames:
             with open(filename, "r") as read_file:
                 slice_data = json.load(read_file)
@@ -71,7 +73,7 @@ class Indexer(pipeline.ProcessingOperation):
             for slice in slice_data:
                 self.whoosh.createIndex(file_locator.file_name, file_locator.file_pathname, slice[util.START_TIME], slice[util.TEXT])
 
-    def process(self, file_locator: util.FileLocator) -> None:
+    def process(self, file_locator: util.FileLocator, context: dict) -> None:
         self.whoosh = WhooshWrapper(file_locator)
         self._processListIndex(file_locator, [file_locator.getSpeechJsonName(), file_locator.getOCRJsonName()])
 

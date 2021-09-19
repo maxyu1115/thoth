@@ -30,7 +30,7 @@ class SlideDetect(pipeline.ProcessingOperation):
     def set_detector(self, new_detector):
         self.detector = new_detector
 
-    def process(self, file_locator: FileLocator):
+    def process(self, file_locator: FileLocator, context: dict) -> None:
         print("Processing video: ", file_locator.file_pathname)
         scenes, stats = self._find_scenes(file_locator.file_pathname)
         # frame_lst, output = self._select_frames(scenes, stats, file_locator, frame_method="middle")
