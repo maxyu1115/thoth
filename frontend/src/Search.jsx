@@ -45,18 +45,18 @@ const SearchPanel = () => {
     }
 
     return (
-        <div>
+        <Box sx={{ flexGrow: 1, margin: 0, padding:0, }}>
             <SearchAppBar callBack={searchHandler}></SearchAppBar>
             {searching && 
             <SearchResultContainer searchResult={lst}></SearchResultContainer> }
-        </div>
+        </Box>
     )
 }
 
 function SearchAppBar(props) {
   const search = props.callBack
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box sx={{ flexGrow: 1, margin: 0, padding:0, }}>
       <AppBar position="static">
         <Toolbar>
           <IconButton
@@ -99,8 +99,8 @@ const SearchResultContainer = (props) => {
     const [video, setVideo] = useState(false);
     const [path, setPath] = useState("")
 
-    const getVideoHandler = async (e) => {
-        const name = e.target.innerHTML
+    const getVideoHandler = async (n) => {
+        const name = n
         console.log(name)
         setVideo(true);
         setPath("http://10.119.176.254:8000/storage/" + name)
@@ -115,14 +115,16 @@ const SearchResultContainer = (props) => {
         // console.log(j)
         
     }
-
+    var keyIndex = 0
     for (const search of searchResult) {
-        toRender.push(<ListItem disablePadding key={search.video_name}>
-            <ListItemButton onClick={getVideoHandler}>
-              <ListItemText primary={search.video_name} />
+        toRender.push(<ListItem disablePadding key={keyIndex} onClick={(e) => getVideoHandler(search.video_name)}>
+            <ListItemButton key={keyIndex}>
+              <ListItemText primary={search.video_name} key={keyIndex} insect={true} 
+                secondary={"timestamp :" + search.timestamp/1000 + " sec"} />
             </ListItemButton>
           </ListItem>)
         toRender.push(<Divider />)
+        keyIndex += 1
     }
     return (
         <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
@@ -130,7 +132,7 @@ const SearchResultContainer = (props) => {
                 {toRender}
             </List>
             {video &&
-            <VideoContainer maxWidth="sm">
+            <VideoContainer maxwidth="sm">
                 <video width="800" height="600" controls>
                     <source src={path} type="video/mp4" />
                     Your browser does not support the video tag.
