@@ -1,26 +1,78 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Tab, Tabs, Typography } from '@mui/material';
+import { Box } from '@mui/system';
+import { useState } from 'react';
+import { CustomDropzone } from './components';
 
-function App(): JSX.Element {
+const a11yProps = (index: number): any => ({
+  id: `thoth-tab-${index}`,
+  'aria-controls': `thoth-tabpanel-${index}`,
+});
+
+const TabPanel = ({
+  children,
+  index,
+  value,
+}: {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}): JSX.Element => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div
+      role="tabpanel"
+      hidden={value != index}
+      id={`thoth-tabpanel-${index}`}
+      aria-labelledby={`thoth-tabpanel-${index}`}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
     </div>
   );
-}
+};
+
+const App = (): JSX.Element => {
+  const [value, setValue] = useState(0);
+  const [videoUrl, setVideoUrl] = useState('');
+
+  const handleTabChange = (
+    event: React.SyntheticEvent,
+    newValue: number,
+  ): void => {
+    event.preventDefault();
+    setValue(newValue);
+  };
+
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs
+          value={value}
+          onChange={handleTabChange}
+          aria-label="basic options for thoth"
+        >
+          <Tab label="Upload Video" {...a11yProps(0)} />
+          <Tab label="View Transcript" {...a11yProps(1)} />
+          <Tab label="View Slides" {...a11yProps(2)} />
+        </Tabs>
+      </Box>
+      <TabPanel value={value} index={0}>
+        {videoUrl === '' ? (
+          <CustomDropzone setter={setVideoUrl} />
+        ) : (
+          <video controls src={videoUrl} />
+        )}
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        Item Two
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        Item Three
+      </TabPanel>
+    </Box>
+  );
+};
 
 export default App;
