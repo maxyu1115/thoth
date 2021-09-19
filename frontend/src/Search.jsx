@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -17,10 +17,28 @@ import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 
 const SearchPanel = () => {
+    const [searching, setSearching] = useState(false);
+
+    const getVideoHandler = async (e) => {
+        // const response = await fetch(
+        //     url,
+        //     {
+        //         method : 'GET',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //             // 'Content-Type': 'application/x-www-form-urlencoded',
+        //           },
+        //         body : {}
+        //     }
+        // ) 
+        setSearching(true);
+    }
+
     return (
         <div>
             <SearchAppBar></SearchAppBar>
-            <SearchResultContainer></SearchResultContainer>
+            {searching && 
+            <SearchResultContainer callBack={getVideoHandler}></SearchResultContainer> }
         </div>
     )
 }
@@ -33,9 +51,9 @@ const Search = styled('div')(({ theme }) => ({
     backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
   marginLeft: 0,
+  padding: 0,
   width: '100%',
   [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
     width: 'auto',
   },
 }));
@@ -67,7 +85,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function SearchAppBar() {
+function SearchAppBar(props) {
+  const search = props.callback
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -96,6 +115,7 @@ function SearchAppBar() {
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
+              onKeyUp={search}
             />
           </Search>
         </Toolbar>
@@ -106,11 +126,28 @@ function SearchAppBar() {
 
 const SearchResultContainer = (props) => {
     // const searchResult = props.resultList()
+    const [video, setVideo] = useState(false);
     const testResultList = [{time: 1000, "video_name" : "test name 1"}, {time: 1000, "video_name" : "test name 2"}]
     const toRender = []
+
+    const searchHandler = async (e) => {
+        // const response = await fetch(
+        //     url,
+        //     {
+        //         method : 'GET',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //             // 'Content-Type': 'application/x-www-form-urlencoded',
+        //           },
+        //         body : {}
+        //     }
+        // ) 
+        setVideo(true);
+    }
+
     for (const search of testResultList) {
         toRender.push(<ListItem disablePadding>
-            <ListItemButton>
+            <ListItemButton onCLick={searchHandler}>
               <ListItemText primary={search.video_name} />
             </ListItemButton>
           </ListItem>)
@@ -121,20 +158,12 @@ const SearchResultContainer = (props) => {
             <List>
                 {toRender}
             </List>
+            { video && 
             <Container maxWidth="sm">
                 <p>This is the container for video.</p>
             </Container>
+            }
         </Box>
-    )
-}
-
-const SearchResultEntry = (props) => {
-    const time = props.data.timestamp
-    const videoName = props.data.video_name
-    return (
-        <div>
-            <div><p>{videoName} ":" {time} </p></div>
-        </div>
     )
 }
 
