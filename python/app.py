@@ -29,7 +29,7 @@ def search():
 
 @app.route("/storage/<path:path>", methods = ["GET"])
 def get_file(path):
-    return send_from_directory("public/", path)
+    return send_from_directory(publicDirectory, path)
 
 
 @app.route("/upload_video", methods = ["POST"])
