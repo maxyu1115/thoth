@@ -49,7 +49,6 @@ export const CustomDropzone = ({
       event.preventDefault();
 
       const url = URL.createObjectURL(files?.[0]);
-      console.log(url);
       setter(url);
     },
   });

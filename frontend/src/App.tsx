@@ -1,8 +1,9 @@
-import { Tab, Tabs, Typography } from '@mui/material';
+import { Button, Tab, Tabs } from '@mui/material';
 import { Box } from '@mui/system';
-import { useState } from 'react';
-import { CustomDropzone } from './components';
 import SearchPanel from './Search';
+import { useRef, useState } from 'react';
+import { VideoJsPlayer } from 'video.js';
+import { CustomDropzone, Slides, VideoPlayer } from './components';
 
 const a11yProps = (index: number): any => ({
   id: `thoth-tab-${index}`,
@@ -21,15 +22,11 @@ const TabPanel = ({
   return (
     <div
       role="tabpanel"
-      hidden={value != index}
+      hidden={value !== index}
       id={`thoth-tabpanel-${index}`}
       aria-labelledby={`thoth-tabpanel-${index}`}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 };
@@ -38,12 +35,18 @@ const App = (): JSX.Element => {
   const [value, setValue] = useState(0);
   const [videoUrl, setVideoUrl] = useState('');
 
+  const playerRef = useRef<VideoJsPlayer | null>(null);
+
   const handleTabChange = (
     event: React.SyntheticEvent,
     newValue: number,
   ): void => {
     event.preventDefault();
     setValue(newValue);
+  };
+
+  const handlePlayerReady = (player: VideoJsPlayer): void => {
+    playerRef.current = player;
   };
 
   return (
@@ -64,14 +67,36 @@ const App = (): JSX.Element => {
         {videoUrl === '' ? (
           <CustomDropzone setter={setVideoUrl} />
         ) : (
-          <video controls src={videoUrl} />
+          <>
+          <VideoPlayer
+            onReady={handlePlayerReady}
+            options={{
+              controls: true,
+              sources: [{ src: videoUrl, type: 'video/mp4' }],
+            }}
+          />
+          <Button onClick={() => playerRef.current?.currentTime(87)} variant="contained">Skip</Button>
+          </>
         )}
       </TabPanel>
       <TabPanel value={value} index={1}>
         Item Two
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three
+        <Slides
+          slides={[
+            {
+              order: 0,
+              path: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Petauroides_volans.jpg/800px-Petauroides_volans.jpg',
+              text: 'MUCH MUCH MUCH text here',
+            },
+            {
+              order: 1,
+              path: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Our_Lady_of_La_Salette.jpg/1024px-Our_Lady_of_La_Salette.jpg',
+              text: 'Lots of text here too',
+            },
+          ]}
+        />
       </TabPanel>
       <TabPanel value={value} index={3}>
         <SearchPanel></SearchPanel>
