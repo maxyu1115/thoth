@@ -15,6 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
+import { VideoPlayer } from './components';
 
 const SearchPanel = () => {
   const [searching, setSearching] = useState(true);
@@ -97,12 +98,21 @@ const SearchResultContainer = (props) => {
   const toRender = [];
   const [video, setVideo] = useState(false);
   const [path, setPath] = useState('');
+  const [time, setTime] = useState(0);
 
-    const getVideoHandler = async (n) => {
+  const handlePlayerReady = (player) => {
+  }
+
+    const getVideoHandler = async (n, time) => {
+        if (video) {
+            setVideo(false)
+            return
+        }
         const name = n
         console.log(name)
         setVideo(true);
         setPath("http://10.119.176.254:8000/storage/" + name)
+        setTime(time)
         console.log(path)
         // const response = await fetch(
         //     "http://10.119.176.254:8000/storage/" + name,
@@ -116,7 +126,8 @@ const SearchResultContainer = (props) => {
     }
     var keyIndex = 0
     for (const search of searchResult) {
-        toRender.push(<ListItem disablePadding key={keyIndex} onClick={(e) => getVideoHandler(search.video_name)}>
+        toRender.push(<ListItem disablePadding key={keyIndex} 
+            onClick={(e) => getVideoHandler(search.video_name, search.timestamp/1000)}>
             <ListItemButton key={keyIndex}>
               <ListItemText primary={search.video_name} key={keyIndex} insect={true} 
                 secondary={"timestamp :" + search.timestamp/1000 + " sec"} />
@@ -133,12 +144,22 @@ const SearchResultContainer = (props) => {
             </List>
             </Box>
             {video &&
-            <VideoContainer maxwidth="sm">
-                <video width="800" height="600" controls={true} autoplay={true}>
+            <Container maxwidth="sm">
+                {/* <video width="800" height="600" controls={true} autoplay={true}>
                     <source src={path} type="video/mp4" />
                     Your browser does not support the video tag.
-                </video>
-            </VideoContainer>
+                </video> */}
+                <VideoPlayer
+                    onReady={handlePlayerReady}
+                    options={{
+                        fluid: true,
+                        controls: true,
+                        sources: [{ src: path, type: 'video/mp4' }],
+                        width: 800,
+                    }}
+                    curTime={time}
+                    />
+            </Container>
             }       
         </Box>
     )
