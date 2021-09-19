@@ -31,8 +31,8 @@ class SlideDetect(pipeline.ProcessingOperation):
         self.detector = new_detector
 
     def process(self, file_locator: FileLocator, context: dict) -> None:
-        print("Processing video: ", file_locator.file_pathname)
-        scenes, stats = self._find_scenes(file_locator.file_pathname)
+        print("Processing video: ", file_locator.getFilePathName())
+        scenes, stats = self._find_scenes(file_locator.getFilePathName())
         # frame_lst, output = self._select_frames(scenes, stats, file_locator, frame_method="middle")
 
         frame_lst = [x[1].get_frames() for x in scenes]
@@ -139,4 +139,4 @@ if __name__ == "__main__":
     filename = "test/SlideChangeTest4.mp4"
     locator = FileLocator(filename, os.getcwd() + "/output4s/temp")
     detect = SlideDetect("unanimated_slides")
-    detect.process(locator)
+    detect.process(locator, dict())

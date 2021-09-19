@@ -12,9 +12,8 @@ import json
 
 
 class SearchValue:
-    def __init__(self, video_name: str, video_path: str, timestamp: int, content: str):
+    def __init__(self, video_name: str, timestamp: int, content: str):
         self.video_name = video_name
-        self.video_path = video_path
         self.timestamp = timestamp
         self.content = content
 
@@ -50,7 +49,7 @@ class WhooshWrapper:
             page_results = searcher.search_page(query, page_num, pagelen=pagelen)
             output = []
             for hit in page_results.results:
-                output.append(SearchValue(hit[VIDEO_NAME], hit[VIDEO_PATH], hit[TIMESTAMP], hit[CONTENT]).__dict__)
+                output.append(SearchValue(hit[VIDEO_NAME], hit[TIMESTAMP], hit[CONTENT]).__dict__)
             return output
 
     def createIndex(self, video_name: str, video_path: str, timestamp: int,  content: str) -> None:
@@ -68,10 +67,10 @@ class Indexer(pipeline.ProcessingOperation):
         for filename in filenames:
             with open(filename, "r") as read_file:
                 slice_data = json.load(read_file)
-            assert(slice_data[0] == file_locator.file_pathname)
+            assert(slice_data[0] == file_locator.getFilePathName())
             slice_data = slice_data[1:]
             for slice in slice_data:
-                self.whoosh.createIndex(file_locator.file_name, file_locator.file_pathname, slice[util.START_TIME], slice[util.TEXT])
+                self.whoosh.createIndex(file_locator.getFileName(), file_locator.getFilePathName(), slice[util.START_TIME], slice[util.TEXT])
 
     def process(self, file_locator: util.FileLocator, context: dict) -> None:
         self.whoosh = WhooshWrapper(file_locator)

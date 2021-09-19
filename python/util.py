@@ -60,6 +60,9 @@ class DirectoryLocator:
         self.audio_directory = os.path.join(self.output_path, "audio")
         _make_path_dir(self.audio_directory)
 
+    def makeFilePathname(self, filename: str) -> str:
+        return os.path.join(self.output_path, filename)
+
     def makeJsonPathname(self, filename: str) -> str:
         return os.path.join(self.json_directory, filename)
 
@@ -103,6 +106,7 @@ class FileLocator(DirectoryLocator):
     def __init__(self, filename: str, output_path: str):
         super().__init__(output_path)
         self.filename = filename
+        self.file_pathname = self.makeFilePathname(filename)
         filename_list = self.filename.split(".")
         if len(filename_list) != 2:
             raise Exception("Bad file name format! ")
@@ -111,6 +115,9 @@ class FileLocator(DirectoryLocator):
         self.detect_json_name = self.makeJsonPathname(self.file_prefix + "detect.json")
         self.speech_json_name = self.makeJsonPathname(self.file_prefix + "speech.json")
         self.ocr_json_name = self.makeJsonPathname(self.file_prefix + "ocr.json")
+
+    def getFilePathName(self) -> str:
+        return self.file_pathname
 
     def getFileName(self) -> str:
         return self.filename

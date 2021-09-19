@@ -31,7 +31,7 @@ class OCR(pipeline.ProcessingOperation):
         # Don't do anything to the video. Instead read the screenshots and
         # filenames = glob.glob(file_locator.getScreenshotDirectory() + "/" + file_locator.getFilePrefix() + "*")
         output_json_name = file_locator.getOCRJsonName()
-        output = [file_locator.file_pathname]
+        output = [file_locator.getFilePathName()]
 
         with open(file_locator.getDetectJsonName(), "r") as read_file:
             slice_data = json.load(read_file)

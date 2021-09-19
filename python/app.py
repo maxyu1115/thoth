@@ -56,7 +56,7 @@ def upload_video():
             return json.dumps(response)
         else:
             filename = secure_filename(file.filename)
-            filepath = directory_locator.makeJsonPathname(filename)
+            filepath = directory_locator.makeFilePathname(filename)
             file.save(filepath)
             flash("Successfully uploaded video to ", filepath)
             _thread.start_new_thread(_process_video, (filename, vid_type,))
@@ -79,7 +79,7 @@ def get_directory_data(path):
 @app.route("/status/<path:path>", methods=["GET"])
 def get_status(path):
     progress = total = 0
-    pipeline = pipelines.get(directory_locator.makeJsonPathname(path))
+    pipeline = pipelines.get(directory_locator.makeFilePathname(path))
     if pipeline is not None:
         progress, total = pipeline.getProgress()
     return json.dumps({"progress": progress, "total": total})
