@@ -144,66 +144,15 @@ const SearchResultContainer = (props) => {
     )
 }
 
-  for (const search of searchResult) {
-    toRender.push(
-      <ListItem disablePadding key={search.video_name}>
-        <ListItemButton onClick={getVideoHandler}>
-          <ListItemText primary={search.video_name} />
-        </ListItemButton>
-      </ListItem>,
-    );
-    toRender.push(<Divider />);
-  }
-  return (
-    <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <List>{toRender}</List>
-      {video && (
-        <Container maxWidth="sm">
-          <video width="320" height="240" controls>
-            <source
-              src="http://10.119.176.254:8000/storage/test3.mp4"
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
-        </Container>
-      )}
-    </Box>
-  );
-};
-
 const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 0,
-  padding: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    padding: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {
       width: 'auto',
@@ -245,7 +194,5 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         },
       },
     },
-  },
-}));
-
+  }));
 export default SearchPanel;
