@@ -38,7 +38,10 @@ export const VideoPlayer = ({
 
   return (
     <div>
-      <video ref={videoRef} className="video-js vjs-big-play-centered" />
+      <video
+        ref={videoRef}
+        className="video-js vjs-big-play-centered vjs-fluid"
+      />
     </div>
   );
 };

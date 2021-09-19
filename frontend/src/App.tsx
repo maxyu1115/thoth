@@ -1,4 +1,11 @@
-import { Button, Tab, Tabs } from '@mui/material';
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Tab,
+  Tabs,
+} from '@mui/material';
 import { Box } from '@mui/system';
 import SearchPanel from './Search';
 import { useRef, useState } from 'react';
@@ -35,6 +42,7 @@ const TabPanel = ({
 const App = (): JSX.Element => {
   const [value, setValue] = useState(0);
   const [videoUrl, setVideoUrl] = useState('');
+  const [isAnimated, setIsAnimated] = useState(false);
 
   const playerRef = useRef<VideoJsPlayer | null>(null);
 
@@ -67,12 +75,28 @@ const App = (): JSX.Element => {
       </Box>
       <TabPanel value={value} index={0}>
         {videoUrl === '' ? (
-          <CustomDropzone setter={setVideoUrl} />
+          <>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isAnimated}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setIsAnimated(e.target.checked)
+                    }
+                  />
+                }
+                label="Does this video have animated slides?"
+              />
+            </FormGroup>
+            <CustomDropzone isAnimated={isAnimated} setter={setVideoUrl} />
+          </>
         ) : (
           <>
             <VideoPlayer
               onReady={handlePlayerReady}
               options={{
+                fluid: true,
                 controls: true,
                 sources: [{ src: videoUrl, type: 'video/mp4' }],
               }}
@@ -109,7 +133,7 @@ const App = (): JSX.Element => {
         <SearchPanel></SearchPanel>
       </TabPanel>
       <TabPanel value={value} index={4}>
-          <MyDropzone />
+        <MyDropzone />
       </TabPanel>
     </Box>
   );

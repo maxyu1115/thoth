@@ -1,19 +1,24 @@
-const BASE_URL = 'http://10.119.176.254:8000/';
+import axios from 'axios';
+
+const BASE_URL = 'http://10.119.176.254:8000';
 
 export const search = async (
   phrase: string,
 ): Promise<any | { errorReason: string }> => {
-  const request = new Request(
-    new URL(`/search?phrase=${phrase}`, BASE_URL).href,
-  );
-  const options = {
-    method: 'GET',
-  };
-  return await fetch(request, options)
-    .then(async (res) => await res.json())
-    .catch((error) => ({
-      errorReason: JSON.stringify(error),
-    }));
+  return await axios
+    .get(`${BASE_URL}/search?phrase=${phrase}`)
+    .then((response) => {
+      console.log(response);
+
+      return response;
+    })
+    .catch((reason) => {
+      console.log(reason);
+
+      return {
+        errorReason: reason,
+      };
+    });
 };
 
 export const getFileByPath = async (
@@ -34,34 +39,28 @@ export const uploadVideo = async (
   file: File,
   isAnimated: boolean,
 ): Promise<any | { errorReason: string }> => {
-  console.log(file);
   const data = new FormData();
-  const vidTypeParam = `vid-type=${
-    isAnimated ? 'animated_slides' : 'unanimated_slides'
-  }`;
-  const request = new Request(
-    new URL(`/upload_video?${vidTypeParam}`, BASE_URL).href,
-  );
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'multipart/form',
-      Connection: 'keep-alive',
-    },
-  };
+  const vidType = isAnimated ? 'animated_slides' : 'unanimated_slides';
 
   data.append('file', file);
 
-  return await fetch(request, {
-    ...options,
-    body: data,
-  })
-    .then(async (res) => await res.json())
-    .then(async (res) => console.log(res))
-    .catch((error) => {
-      console.error(error);
+  return await axios
+    .post(`${BASE_URL}/upload-video?vid-type=${vidType}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    .then((response) => {
+      console.log(response);
 
-      return { errorReason: JSON.stringify(error) };
+      return response;
+    })
+    .catch((reason) => {
+      console.log(reason);
+
+      return {
+        errorReason: reason,
+      };
     });
 };
 
