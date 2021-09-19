@@ -28,13 +28,20 @@ class Pipeline:
     def __init__(self):
         self.operations: list[ProcessingOperation] = []
         self.context: dict = dict()
+        self.status = 0
+
+    def getProgress(self) -> (int, int):
+        return self.status, len(self.operations)
 
     def addOperation(self, op: ProcessingOperation):
         self.operations.append(op)
 
     def processVideo(self, file_locator: FileLocator) -> None:
+        self.status = 0
         for op in self.operations:
             op.process(file_locator, self.context)
+            self.status += 1
+
         for op in self.operations:
             op.postProcess(file_locator)
 
