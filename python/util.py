@@ -112,9 +112,13 @@ class FileLocator(DirectoryLocator):
             raise Exception("Bad file name format! ")
         self.file_prefix = str.format("{}_{}_", filename_list[0], filename_list[1])
 
-        self.detect_json_name = self.makeJsonPathname(self.file_prefix + "detect.json")
-        self.speech_json_name = self.makeJsonPathname(self.file_prefix + "speech.json")
-        self.ocr_json_name = self.makeJsonPathname(self.file_prefix + "ocr.json")
+        self.detect_json_name = self.file_prefix + "detect.json"
+        self.speech_json_name = self.file_prefix + "speech.json"
+        self.ocr_json_name = self.file_prefix + "ocr.json"
+
+        self.detect_json_pathname = self.makeJsonPathname(self.file_prefix + "detect.json")
+        self.speech_json_pathname = self.makeJsonPathname(self.file_prefix + "speech.json")
+        self.ocr_json_pathname = self.makeJsonPathname(self.file_prefix + "ocr.json")
 
     def getFilePathName(self) -> str:
         return self.file_pathname
@@ -131,7 +135,24 @@ class FileLocator(DirectoryLocator):
         :param time_in_milliseconds: time of screenshot in milliseconds
         :return: name of screenshot at time t
         """
+        return self.file_prefix + str(int(time_in_milliseconds)) + ".png"
+
+    def getScreenshotPathName(self, time_in_milliseconds: int) -> str:
+        """
+        Sample output: "xxx/image/test_mp4_1034.png"
+        :param time_in_milliseconds: time of screenshot in milliseconds
+        :return: name of screenshot at time t
+        """
         return os.path.join(self.screenshot_directory, self.file_prefix + str(int(time_in_milliseconds)) + ".png")
+
+    def getDetectJsonPathName(self) -> str:
+        return self.detect_json_pathname
+
+    def getSpeechJsonPathName(self) -> str:
+        return self.speech_json_pathname
+
+    def getOCRJsonPathName(self) -> str:
+        return self.ocr_json_pathname
 
     def getDetectJsonName(self) -> str:
         return self.detect_json_name

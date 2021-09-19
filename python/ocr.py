@@ -30,10 +30,10 @@ class OCR(pipeline.ProcessingOperation):
     def process(self, file_locator: FileLocator, context: dict) -> None:
         # Don't do anything to the video. Instead read the screenshots and
         # filenames = glob.glob(file_locator.getScreenshotDirectory() + "/" + file_locator.getFilePrefix() + "*")
-        output_json_name = file_locator.getOCRJsonName()
-        output = [file_locator.getFilePathName()]
+        output_json_name = file_locator.getOCRJsonPathName()
+        output = [file_locator.getFileName()]
 
-        with open(file_locator.getDetectJsonName(), "r") as read_file:
+        with open(file_locator.getDetectJsonPathName(), "r") as read_file:
             slice_data = json.load(read_file)
 
         for slice in slice_data:

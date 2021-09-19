@@ -132,7 +132,7 @@ class VideoToTextAssembler(ProcessingOperation):
 
     @staticmethod
     def assemble_words_by_slides(file_locator: util.FileLocator, word_list):
-        detect_json_path = file_locator.getDetectJsonName()
+        detect_json_path = file_locator.getDetectJsonPathName()
         # Opening JSON file
         jfile = open(detect_json_path,)
         
@@ -141,8 +141,8 @@ class VideoToTextAssembler(ProcessingOperation):
         slides = json.load(jfile)
         str = ""
         idx = 0
-        output = [file_locator.getFilePathName()]
-        output_json_name = file_locator.getSpeechJsonName()
+        output = [file_locator.getFileName()]
+        output_json_name = file_locator.getSpeechJsonPathName()
 
         # print("word list", word_list[:20])
         # print("json time", output)
@@ -151,7 +151,7 @@ class VideoToTextAssembler(ProcessingOperation):
             slide = slides[i]
             start_time = slide["start_time"]
             end_time = slide["end_time"]
-            file_name = slide["image"]
+            file_name = file_locator.getScreenshotName(start_time)
             str = ""
             while idx < len(word_list):
                 # print("start time", start_time)

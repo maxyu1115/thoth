@@ -39,7 +39,7 @@ class SlideDetect(pipeline.ProcessingOperation):
         # print(frame_lst)
         output = self.export_frames(file_locator, frame_lst)
         # write data to json file
-        with open(file_locator.getDetectJsonName(), "w") as write_file:
+        with open(file_locator.getDetectJsonPathName(), "w") as write_file:
             json.dump(output, write_file)
 
     def _find_scenes(self, video_path):
@@ -95,7 +95,7 @@ class SlideDetect(pipeline.ProcessingOperation):
                 start_time = int(frames[slice_num - 1] * 1000 / fps) if slice_num > 0 else 0
                 end_time = int(frame_num * 1000 / fps)
                 image_time = int(top_frame_idx * 1000 / fps)
-                image_path = file_locator.getScreenshotName(image_time)
+                image_path = file_locator.getScreenshotPathName(start_time)
                 # print(image_path, top_frame)
                 cv2.imwrite(image_path, top_frame)
                 output.append(util.make_detect_dict(start_time, end_time, image_time, image_path))
@@ -121,7 +121,7 @@ class SlideDetect(pipeline.ProcessingOperation):
         start_time = int(frames[slice_num - 1] * 1000 / fps) if slice_num > 0 else 0
         end_time = int(frame_num * 1000 / fps)
         image_time = int(top_frame_idx * 1000 / fps)
-        image_path = file_locator.getScreenshotName(image_time)
+        image_path = file_locator.getScreenshotPathName(start_time)
         # print(image_path, top_frame)
         cv2.imwrite(image_path, top_frame)
         output.append(util.make_detect_dict(start_time, end_time, image_time, image_path))

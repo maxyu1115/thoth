@@ -51,14 +51,12 @@ def get_file(path):
     return send_from_directory(storageDirectory, path)
 
 
-@app.route("/upload_video", methods=["POST"])
+@app.route("/upload-video", methods=["POST"])
 def upload_video():
     vid_type = request.args.get('vid-type')
     try:
         if 'file' not in request.files:
             response = {"error": 'No file!'}
-            print(request)
-            print(request.files)
             return json.dumps(response)
         file = request.files['file']
         if not _allowed_file(file.filename):
@@ -77,6 +75,7 @@ def upload_video():
     return json.dumps(response)
 
 @app.route("/directory-data", methods=["GET"], defaults={'path': ''})
+@app.route("/directory-data/", methods=["GET"], defaults={'path': ''})
 @app.route("/directory-data/<path:path>", methods=["GET"])
 def get_directory_data(path):
     file_lst = glob.glob(os.path.join(directory_locator.getOutputRoot(), path) + "/*")
