@@ -1,4 +1,4 @@
-# Thoth
+# Thoth - the video distiller
 ### Team members: Kaichun Luo, Lorraine Lyu, Victor Song, Max Yu
 
 ## Inspiration
