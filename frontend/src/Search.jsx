@@ -17,76 +17,44 @@ import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 
 const SearchPanel = () => {
-    const [searching, setSearching] = useState(false);
+    const [searching, setSearching] = useState(true);
+    const [lst, setLst] = useState([])
 
-    const getVideoHandler = async (e) => {
-        // const response = await fetch(
-        //     url,
-        //     {
-        //         method : 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //             // 'Content-Type': 'application/x-www-form-urlencoded',
-        //           },
-        //         body : {}
-        //     }
-        // ) 
-        setSearching(true);
+    const searchHandler = async (e) => {
+        if (e.keyCode === 13) {
+            // Cancel the default action, if needed
+            e.preventDefault();
+            const queryWord = e.target.value
+            console.log(queryWord)
+          
+            const response = await fetch(
+                "http://10.119.176.254:8000/search?phrase=" + queryWord,
+                {
+                    method : 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }
+            ) 
+            const j = await response.json()
+            console.log(j)
+            setSearching(true);
+            setLst(JSON.parse(JSON.stringify(j)))
+        }
     }
 
     return (
         <div>
-            <SearchAppBar></SearchAppBar>
+            <SearchAppBar callBack={searchHandler}></SearchAppBar>
             {searching && 
-            <SearchResultContainer callBack={getVideoHandler}></SearchResultContainer> }
+            <SearchResultContainer searchResult={lst}></SearchResultContainer> }
         </div>
     )
 }
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 0,
-  padding: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    width: 'auto',
-  },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      width: '12ch',
-      '&:focus': {
-        width: '20ch',
-      },
-    },
-  },
-}));
-
 function SearchAppBar(props) {
-  const search = props.callback
+  const search = props.callBack
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -108,14 +76,14 @@ function SearchAppBar(props) {
           >
             Library
           </Typography>
-          <Search>
+          <Search onKeyDown={(e) => search(e)}
+              tabIndex="0">
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
               placeholder="Search…"
               inputProps={{ 'aria-label': 'search' }}
-              onKeyUp={search}
             />
           </Search>
         </Toolbar>
@@ -125,29 +93,32 @@ function SearchAppBar(props) {
 }
 
 const SearchResultContainer = (props) => {
-    // const searchResult = props.resultList()
-    const [video, setVideo] = useState(false);
-    const testResultList = [{time: 1000, "video_name" : "test name 1"}, {time: 1000, "video_name" : "test name 2"}]
+    const searchResult = props.searchResult
+    // const testResultList = [{time: 1000, "video_name" : "test name 1"}, {time: 1000, "video_name" : "test name 2"}]
     const toRender = []
+    const [video, setVideo] = useState(false);
+    const [path, setPath] = useState("")
 
-    const searchHandler = async (e) => {
-        // const response = await fetch(
-        //     url,
-        //     {
-        //         method : 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //             // 'Content-Type': 'application/x-www-form-urlencoded',
-        //           },
-        //         body : {}
-        //     }
-        // ) 
+    const getVideoHandler = async (e) => {
+        const name = e.target.innerHTML
+        console.log(name)
         setVideo(true);
+        setPath("http://10.119.176.254:8000/storage/" + name)
+        console.log(path)
+        const response = await fetch(
+            "http://10.119.176.254:8000/storage/" + name,
+            {
+                method : 'GET',
+            }
+        ) 
+        const j = await response.json()
+        console.log(j)
+        
     }
 
-    for (const search of testResultList) {
-        toRender.push(<ListItem disablePadding>
-            <ListItemButton onCLick={searchHandler}>
+    for (const search of searchResult) {
+        toRender.push(<ListItem disablePadding key={search.video_name}>
+            <ListItemButton onClick={getVideoHandler}>
               <ListItemText primary={search.video_name} />
             </ListItemButton>
           </ListItem>)
@@ -158,13 +129,59 @@ const SearchResultContainer = (props) => {
             <List>
                 {toRender}
             </List>
-            { video && 
+            {video &&
             <Container maxWidth="sm">
-                <p>This is the container for video.</p>
+                <video width="320" height="240" controls>
+                    <source src="http://10.119.176.254:8000/storage/test3.mp4" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
             </Container>
-            }
+            }       
         </Box>
     )
 }
+
+
+const Search = styled('div')(({ theme }) => ({
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    padding: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      width: 'auto',
+    },
+  }));
+  
+  const SearchIconWrapper = styled('div')(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }));
+  
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    '& .MuiInputBase-input': {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create('width'),
+      width: '100%',
+      [theme.breakpoints.up('sm')]: {
+        width: '12ch',
+        '&:focus': {
+          width: '20ch',
+        },
+      },
+    },
+  }));
 
 export default SearchPanel;
