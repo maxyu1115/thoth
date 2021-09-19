@@ -20,7 +20,7 @@ export const VideoPlayer = ({
       if (videoElement == null) return;
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
-        console.log("Player is ready!")
+        console.log('Player is ready!');
         onReady?.(player);
       }));
     }

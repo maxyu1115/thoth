@@ -4,6 +4,7 @@ import SearchPanel from './Search';
 import { useRef, useState } from 'react';
 import { VideoJsPlayer } from 'video.js';
 import { CustomDropzone, Slides, VideoPlayer } from './components';
+import { MyDropzone } from './components/MyDropzone';
 
 const a11yProps = (index: number): any => ({
   id: `thoth-tab-${index}`,
@@ -61,6 +62,7 @@ const App = (): JSX.Element => {
           <Tab label="View Transcript" {...a11yProps(1)} />
           <Tab label="View Slides" {...a11yProps(2)} />
           <Tab label="Key Word Search" {...a11yProps(3)} />
+          <Tab label="Test Upload" {...a11yProps(4)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -68,14 +70,19 @@ const App = (): JSX.Element => {
           <CustomDropzone setter={setVideoUrl} />
         ) : (
           <>
-          <VideoPlayer
-            onReady={handlePlayerReady}
-            options={{
-              controls: true,
-              sources: [{ src: videoUrl, type: 'video/mp4' }],
-            }}
-          />
-          <Button onClick={() => playerRef.current?.currentTime(87)} variant="contained">Skip</Button>
+            <VideoPlayer
+              onReady={handlePlayerReady}
+              options={{
+                controls: true,
+                sources: [{ src: videoUrl, type: 'video/mp4' }],
+              }}
+            />
+            <Button
+              onClick={() => playerRef.current?.currentTime(87)}
+              variant="contained"
+            >
+              Skip
+            </Button>
           </>
         )}
       </TabPanel>
@@ -100,6 +107,9 @@ const App = (): JSX.Element => {
       </TabPanel>
       <TabPanel value={value} index={3}>
         <SearchPanel></SearchPanel>
+      </TabPanel>
+      <TabPanel value={value} index={4}>
+          <MyDropzone />
       </TabPanel>
     </Box>
   );
