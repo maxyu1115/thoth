@@ -127,13 +127,15 @@ const SearchResultContainer = (props) => {
         keyIndex += 1
     }
     return (
-        <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+        <Box sx={{ width: '100%', bgcolor: 'background.paper',display: "flex", flexDirection: "row" }}>
+            <Box sx={{ width: '30%'}}>
             <List>
                 {toRender}
             </List>
+            </Box>
             {video &&
             <VideoContainer maxwidth="sm">
-                <video width="800" height="600" controls>
+                <video width="800" height="600" controls={true} autoplay={true}>
                     <source src={path} type="video/mp4" />
                     Your browser does not support the video tag.
                 </video>
@@ -171,13 +173,12 @@ const Search = styled('div')(({ theme }) => ({
   
   const VideoContainer = styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 2),
-    float: "right",
+    marginRight: 0,
+    marginLeft: "auto",
     height: '100%',
-    position: 'absolute',
+    position: 'relative',
     pointerEvents: 'none',
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'right',
   }));
 
   const StyledInputBase = styled(InputBase)(({ theme }) => ({
