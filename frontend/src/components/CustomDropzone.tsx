@@ -1,4 +1,3 @@
-import { uploadVideo } from '../dataloader';
 import React, { useMemo } from 'react';
 import { DropEvent, useDropzone } from 'react-dropzone';
 

@@ -23,7 +23,11 @@ export const SlidePanel = ({
       const name = getSpeechJsonPath(videoName);
       getFileByPath(name)
         .then((res) => {
-          setSpeech(res.data.splice(1));
+          setSpeech(
+            res.data
+              .splice(1)
+              .filter((data: ImageInfo) => data.text.trim() !== ''),
+          );
         })
         .catch((reason) => console.log(reason));
     }

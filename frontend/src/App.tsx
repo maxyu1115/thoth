@@ -2,7 +2,6 @@ import { Tab, Tabs } from '@mui/material';
 import { Box } from '@mui/system';
 import SearchPanel from './Search';
 import { useState } from 'react';
-import { Slides } from './components';
 import { PreviewUpload, SlidePanel } from './pages';
 
 const a11yProps = (index: number): any => ({
