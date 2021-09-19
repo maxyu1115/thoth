@@ -29,14 +29,14 @@ class VideoToTextTranscriber(ProcessingOperation):
         super().__init__()
         self.file_locator = None
         self.word_list = []
-        self.pool = Pool()
 
     def process(self, file_locator: util.FileLocator, context: dict) -> None:
         self.file_locator = file_locator
-        context["word_lst"] = self.pool.apply_async(self.get_speech_from_video, args=(file_locator,))
+        context["word_lst"] = Pool().apply_async(self.get_speech_from_video, args=())
+        # context["word_lst"] = self.get_speech_from_video()
         # self.assemble_words_by_slides(word_list)
 
-    def postProcess(self) -> None:
+    def postProcess(self, file) -> None:
         audio_dir = self.file_locator.getAudioDirectory()
         files = glob.glob(audio_dir + "/*")
         for f in files: 
@@ -124,13 +124,14 @@ class VideoToTextAssembler(ProcessingOperation):
     def process(self, file_locator: util.FileLocator, context: dict) -> None:
         # wait on the async task
         word_lst = context["word_lst"].get()
+        # word_lst = context["word_lst"]
         return self.assemble_words_by_slides(file_locator, word_lst)
 
     def postProcess(self, file_locator: util.FileLocator) -> None:
         util.cleanDir(file_locator.getAudioDirectory())
 
     @staticmethod
-    def assemble_words_by_slides(self, file_locator: util.FileLocator, word_list):
+    def assemble_words_by_slides(file_locator: util.FileLocator, word_list):
         detect_json_path = file_locator.getDetectJsonName()
         # Opening JSON file
         jfile = open(detect_json_path,)
